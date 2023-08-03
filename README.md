@@ -1,3 +1,6 @@
-- mudar nome do repo
-- achar um projeto para reproduzir em htmx
-- colocar um orm e salvar no banco
+# Cars-Hub
+
+## TODO
+- make handlers
+- start templates
+- define a design 
