@@ -18,7 +18,7 @@ func (h *ContactHandler) Index(c *gin.Context) {
 	contacts := []models.Contact{}
 	h.DB.Find(&contacts)
 
-	c.HTML(http.StatusOK, "pages/index", gin.H{
+	c.HTML(http.StatusOK, "pages/contacts/index", gin.H{
 		"Title":    "Contacts page",
 		"Contacts": contacts,
 	})
@@ -30,7 +30,7 @@ func (h *ContactHandler) Show(c *gin.Context) {
 	contact := models.Contact{}
 	_ = h.DB.Find(&contact, ID)
 
-	c.HTML(http.StatusOK, "partials/contact-card", contact.ToMap())
+	c.HTML(http.StatusOK, "partials/contacts/index-card", contact.ToMap())
 }
 
 func (h *ContactHandler) Edit(c *gin.Context) {
@@ -39,7 +39,12 @@ func (h *ContactHandler) Edit(c *gin.Context) {
 	contact := models.Contact{}
 	_ = h.DB.Find(&contact, ID)
 
-	c.HTML(http.StatusOK, "partials/contact-form", contact.ToMap())
+	c.HTML(http.StatusOK, "partials/contacts/upsert-form", contact.ToMap())
+}
+
+func (h *ContactHandler) Create(c *gin.Context) {
+	contact := models.Contact{}
+	c.HTML(http.StatusOK, "partials/contacts/upsert-form", contact.ToMap())
 }
 
 func (h *ContactHandler) Store(c *gin.Context) {
@@ -51,7 +56,7 @@ func (h *ContactHandler) Store(c *gin.Context) {
 
 	_ = h.DB.Create(&contact)
 
-	c.HTML(http.StatusOK, "partials/contact-card", contact.ToMap())
+	c.HTML(http.StatusOK, "partials/contacts/index-card", contact.ToMap())
 }
 
 func (h *ContactHandler) Update(c *gin.Context) {
@@ -66,7 +71,7 @@ func (h *ContactHandler) Update(c *gin.Context) {
 
 	h.DB.Model(&contact).Where("ID = ?", ID).Updates(&contact)
 
-	c.HTML(http.StatusOK, "partials/contact-card", contact.ToMap())
+	c.HTML(http.StatusOK, "partials/contacts/index-card", contact.ToMap())
 }
 
 func (h *ContactHandler) Delete(c *gin.Context) {
@@ -81,5 +86,5 @@ func (h *ContactHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusNoContent, "partials/contact-card", contact.ToMap())
+	c.HTML(http.StatusNoContent, "partials/contacts/index-card", contact.ToMap())
 }

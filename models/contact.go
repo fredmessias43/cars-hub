@@ -18,13 +18,3 @@ func (c *Contact) ToMap() map[string]any {
 		"Email":     c.Email,
 	}
 }
-
-func GetContactById(contacts []Contact, ID int) Contact {
-	var result Contact
-	for _, v := range contacts {
-		if v.ID == ID {
-			result = v
-		}
-	}
-	return result
-}
