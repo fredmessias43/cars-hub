@@ -1,0 +1,85 @@
+package handlers
+
+import (
+	"fmt"
+	"net/http"
+	"strconv"
+
+	"github.com/fredmessias43/car-hub/models"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+type ContactHandler struct {
+	DB *gorm.DB
+}
+
+func (h *ContactHandler) Index(c *gin.Context) {
+	contacts := []models.Contact{}
+	h.DB.Find(&contacts)
+
+	c.HTML(http.StatusOK, "pages/index", gin.H{
+		"Title":    "Contacts page",
+		"Contacts": contacts,
+	})
+}
+
+func (h *ContactHandler) Show(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param(("contact")))
+
+	contact := models.Contact{}
+	_ = h.DB.Find(&contact, ID)
+
+	c.HTML(http.StatusOK, "partials/contact-card", contact.ToMap())
+}
+
+func (h *ContactHandler) Edit(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param(("contact")))
+
+	contact := models.Contact{}
+	_ = h.DB.Find(&contact, ID)
+
+	c.HTML(http.StatusOK, "partials/contact-form", contact.ToMap())
+}
+
+func (h *ContactHandler) Store(c *gin.Context) {
+	var contact models.Contact
+
+	if err := c.ShouldBind(&contact); err != nil {
+		return
+	}
+
+	_ = h.DB.Create(&contact)
+
+	c.HTML(http.StatusOK, "partials/contact-card", contact.ToMap())
+}
+
+func (h *ContactHandler) Update(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param(("contact")))
+
+	contact := models.Contact{}
+	_ = h.DB.Find(&contact, ID)
+
+	if err := c.ShouldBind(&contact); err != nil {
+		return
+	}
+
+	h.DB.Model(&contact).Where("ID = ?", ID).Updates(&contact)
+
+	c.HTML(http.StatusOK, "partials/contact-card", contact.ToMap())
+}
+
+func (h *ContactHandler) Delete(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param("id"))
+
+	contact := models.Contact{}
+	_ = h.DB.Find(&contact, ID)
+
+	err := h.DB.Delete(&contact, ID)
+	if err != nil {
+		fmt.Printf(err.Error.Error())
+		return
+	}
+
+	c.HTML(http.StatusNoContent, "partials/contact-card", contact.ToMap())
+}

@@ -1,0 +1,22 @@
+{{ define "pages/index" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ .Title }}</title>
+</head>
+<body>
+
+  {{ template "partials/contact-create-form" }}
+
+  <div id="contact-list">
+    {{ range .Contacts }}
+      {{ template "partials/contact-card" . }}
+    {{ end }}
+  </div>
+
+  <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+</body>
+</html>
+{{ end }}
