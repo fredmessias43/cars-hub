@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"io"
 	"log"
 	"os"
@@ -16,6 +17,28 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+func toMapStringAny(args ...any) map[string]any {
+	var stringValues []string
+	var anyValues []any
+
+	for i := 0; i < len(args); i = i + 2 {
+		arg := args[i]
+		stringValues = append(stringValues, arg.(string))
+	}
+
+	for i := 1; i < len(args); i = i + 2 {
+		arg := args[i]
+		anyValues = append(anyValues, arg.(any))
+	}
+
+	newMap := map[string]any{}
+	for i := 0; i < len(stringValues); i++ {
+		newMap[stringValues[i]] = anyValues[i]
+	}
+
+	return newMap
+}
+
 func main() {
 	db, err := configDb()
 	if err != nil {
@@ -23,10 +46,28 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.SetFuncMap(template.FuncMap{
+		"toMapStringAny": toMapStringAny,
+	})
 	router.LoadHTMLGlob("templates/**/*")
 
 	contactHandler := handlers.ContactHandler{DB: db}
 	routerResource(router, "contact", &contactHandler)
+
+	manufacturerHandler := handlers.ManufacturerHandler{DB: db}
+	routerResource(router, "manufacturer", &manufacturerHandler)
+
+	brandHandler := handlers.BrandHandler{DB: db}
+	routerResource(router, "brand", &brandHandler)
+
+	carModelHandler := handlers.CarModelHandler{DB: db}
+	routerResource(router, "car_model", &carModelHandler)
+
+	carModelVersionHandler := handlers.CarModelVersionHandler{DB: db}
+	routerResource(router, "car_model_version", &carModelVersionHandler)
+
+	carHandler := handlers.CarHandler{DB: db}
+	routerResource(router, "car", &carHandler)
 
 	router.Run(":8080")
 }

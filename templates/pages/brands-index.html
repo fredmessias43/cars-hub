@@ -1,4 +1,4 @@
-{{ define "pages/contacts/index" }}
+{{ define "pages/brands/index" }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,11 +8,11 @@
 </head>
 <body>
 
-  {{ template "partials/contacts/upsert-form" }}
+  {{ template "partials/brands/upsert-form" }}
 
-  <div id="contact-list">
-    {{ range .contacts }}
-      {{ template "partials/contacts/index-card" . }}
+  <div id="brand-list">
+    {{ range .brands }}
+      {{ template "partials/brands/index-card" . }}
     {{ end }}
   </div>
 

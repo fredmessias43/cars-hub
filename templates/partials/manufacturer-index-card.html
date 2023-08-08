@@ -1,0 +1,9 @@
+{{ define "partials/manufacturers/index-card" }}
+<div hx-target="this" hx-swap="outerHTML">
+  <div><label>Name</label>: {{ .Manufacturer.Name }}</div>
+  <div><label>CountryOrigin</label>: {{ .Manufacturer.CountryOrigin }}</div>
+  <button hx-get="/manufacturers/{{ .Manufacturer.ID }}/edit" class="btn btn-primary">Edit</button>
+  <button class="btn btn-danger" hx-delete="/manufacturers/{{ .Manufacturer.ID }}">Delete</button>
+  <span class="htmx-indicator">Loading...</span>
+</div>
+{{ end }}

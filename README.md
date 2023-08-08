@@ -1,6 +1,8 @@
 # Cars-Hub
 
 ## TODO
-- make handlers
+- [x] make handlers
 - start templates
-- define a design 
+  - make crud page
+- [-] define a design
+  - stole from webmotors

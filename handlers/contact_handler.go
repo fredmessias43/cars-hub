@@ -19,8 +19,8 @@ func (h *ContactHandler) Index(c *gin.Context) {
 	h.DB.Find(&contacts)
 
 	c.HTML(http.StatusOK, "pages/contacts/index", gin.H{
-		"Title":    "Contacts page",
-		"Contacts": contacts,
+		"title":    "Contacts page",
+		"contacts": contacts,
 	})
 }
 
@@ -75,7 +75,7 @@ func (h *ContactHandler) Update(c *gin.Context) {
 }
 
 func (h *ContactHandler) Delete(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("id"))
+	ID, _ := strconv.Atoi(c.Param("contact"))
 
 	contact := models.Contact{}
 	_ = h.DB.Find(&contact, ID)
