@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -60,6 +59,8 @@ func (h *CarHandler) Store(c *gin.Context) {
 		return
 	}
 
+	_ = h.DB.Find(&car.CarModelVersion, car.ModelVersionID)
+
 	_ = h.DB.Create(&car)
 
 	c.HTML(http.StatusOK, "partials/cars/index-card", gin.H{
@@ -87,16 +88,7 @@ func (h *CarHandler) Update(c *gin.Context) {
 func (h *CarHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("car"))
 
-	car := models.Car{}
-	_ = h.DB.Find(&car, ID)
+	h.DB.Delete(&models.Car{}, ID)
 
-	err := h.DB.Delete(&car, ID)
-	if err != nil {
-		fmt.Printf(err.Error.Error())
-		return
-	}
-
-	c.HTML(http.StatusNoContent, "partials/cars/index-card", gin.H{
-		"Car": gin.H{},
-	})
+	return
 }

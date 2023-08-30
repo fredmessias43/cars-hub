@@ -4,13 +4,14 @@ import "gorm.io/gorm"
 
 type Car struct {
 	gorm.Model
-	ID             int     `json:"id" gorm:"primaryKey"`
-	ModelVersionID int     `json:"model_version_id"`
-	Color          string  `json:"color"`
-	Mileage        int     `json:"mileage"`
-	Price          float64 `json:"price"`
-	FuelType       string  `json:"fuel_type"`
-	Transmission   string  `json:"transmission"`
+	ID              int             `json:"id" gorm:"primaryKey"`
+	Color           string          `json:"color"`
+	Mileage         int             `json:"mileage"`
+	Price           float64         `json:"price"`
+	FuelType        string          `json:"fuel_type"`
+	Transmission    string          `json:"transmission"`
+	ModelVersionID  int             `json:"model_version_id"`
+	CarModelVersion CarModelVersion `gorm:"foreignKey:ModelVersionID"`
 }
 
 func (m *Car) ToMap() map[string]any {

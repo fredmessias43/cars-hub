@@ -59,6 +59,8 @@ func (h *BrandHandler) Store(c *gin.Context) {
 		return
 	}
 
+	_ = h.DB.Find(&brand.Manufacturer, brand.ManufacturerID)
+
 	_ = h.DB.Create(&brand)
 
 	c.HTML(http.StatusOK, "partials/brands/index-card", gin.H{

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -77,14 +76,7 @@ func (h *ContactHandler) Update(c *gin.Context) {
 func (h *ContactHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("contact"))
 
-	contact := models.Contact{}
-	_ = h.DB.Find(&contact, ID)
+	h.DB.Delete(&models.Contact{}, ID)
 
-	err := h.DB.Delete(&contact, ID)
-	if err != nil {
-		fmt.Printf(err.Error.Error())
-		return
-	}
-
-	c.HTML(http.StatusNoContent, "partials/contacts/index-card", contact.ToMap())
+	return
 }

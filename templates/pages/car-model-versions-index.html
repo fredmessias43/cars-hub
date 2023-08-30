@@ -1,4 +1,4 @@
-{{ define "pages/contacts/index" }}
+{{ define "pages/car-model-versions/index" }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,11 +8,11 @@
 </head>
 <body>
 
-  {{ template "partials/contacts/upsert-form" }}
+  {{ template "partials/car-model-versions/upsert-form" }}
 
-  <div id="contact-list">
-    {{ range .Contacts }}
-      {{ template "partials/contacts/index-card" toMapStringAny "Contact" . }}
+  <div id="car-model-version-list">
+    {{ range .CarModelVersions }}
+      {{ template "partials/car-model-versions/index-card" toMapStringAny "CarModelVersion" . }}
     {{ end }}
   </div>
 

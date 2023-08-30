@@ -1,20 +1,20 @@
 {{ define "partials/brands/upsert-form" }}
-{{ if .ID }}
-<form hx-put="/brands/{{ .ID }}" hx-target="this" hx-swap="outerHTML"></form>
+{{ if .Brand.ID }}
+<form hx-put="/brands/{{ .Brand.ID }}" hx-target="this" hx-swap="outerHTML"></form>
 {{ else }}
 <form hx-post="/brands" hx-target="#brand-list" hx-swap="beforeend">
   {{ end }}
   <div>
     <label>Name</label>
-    <input type="text" name="Name" value="{{ .Name }}">
+    <input type="text" name="Name" value="{{ .Brand.Name }}">
   </div>
   <div class="form-group">
     <label>ManufacturerID</label>
-    <input type="text" name="ManufacturerID" value="{{ .ManufacturerID }}">
+    <input type="text" name="ManufacturerID" value="{{ .Brand.ManufacturerID }}">
   </div>
   <button class="btn">Save</button>
-  {{ if .ID }}
-  <button class="btn" hx-get="/brands/{{ .ID }}">Cancel</button>
+  {{ if .Brand.ID }}
+  <button class="btn" hx-get="/brands/{{ .Brand.ID }}">Cancel</button>
   {{ end }}
   <span class="htmx-indicator">Loading...</span>
 </form>

@@ -1,24 +1,24 @@
 {{ define "partials/contacts/upsert-form" }}
-{{ if .ID }}
-<form hx-put="/contacts/{{ .ID }}" hx-target="this" hx-swap="outerHTML"></form>
+{{ if .Contact.ID }}
+<form hx-put="/contacts/{{ .Contact.ID }}" hx-target="this" hx-swap="outerHTML"></form>
 {{ else }}
 <form hx-post="/contacts" hx-target="#contact-list" hx-swap="beforeend">
   {{ end }}
   <div>
     <label>First Name</label>
-    <input type="text" name="FirstName" value="{{ .FirstName }}">
+    <input type="text" name="FirstName" value="{{ .Contact.FirstName }}">
   </div>
   <div class="form-group">
     <label>Last Name</label>
-    <input type="text" name="LastName" value="{{ .LastName }}">
+    <input type="text" name="LastName" value="{{ .Contact.LastName }}">
   </div>
   <div class="form-group">
     <label>Email Address</label>
-    <input type="email" name="Email" value="{{ .Email }}">
+    <input type="email" name="Email" value="{{ .Contact.Email }}">
   </div>
   <button class="btn">Save</button>
-  {{ if .ID }}
-  <button class="btn" hx-get="/contacts/{{ .ID }}">Cancel</button>
+  {{ if .Contact.ID }}
+  <button class="btn" hx-get="/contacts/{{ .Contact.ID }}">Cancel</button>
   {{ end }}
   <span class="htmx-indicator">Loading...</span>
 </form>

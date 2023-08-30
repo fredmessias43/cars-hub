@@ -4,15 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ .title }}</title>
+  <title>{{ .Title }}</title>
 </head>
 <body>
 
   {{ template "partials/brands/upsert-form" }}
 
   <div id="brand-list">
-    {{ range .brands }}
-      {{ template "partials/brands/index-card" . }}
+    {{ range .Brands }}
+      {{ template "partials/brands/index-card" toMapStringAny "Brand" . }}
     {{ end }}
   </div>
 

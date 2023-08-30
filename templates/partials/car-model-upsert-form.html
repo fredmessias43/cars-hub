@@ -1,0 +1,25 @@
+{{ define "partials/car-models/upsert-form" }}
+{{ if .CarModel.ID }}
+<form hx-put="/car_models/{{ .CarModel.ID }}" hx-target="this" hx-swap="outerHTML"></form>
+{{ else }}
+<form hx-post="/car_models" hx-target="#car-model-list" hx-swap="beforeend">
+  {{ end }}
+  <div class="form-group" >
+    <label>Name</label>
+    <input type="text" name="Name" value="{{ .CarModel.Name }}">
+  </div>
+  <div class="form-group" >
+    <label>BrandID</label>
+    <input type="text" name="BrandID" value="{{ .CarModel.BrandID }}">
+  </div>
+  <div class="form-group">
+    <label>ManufactureYear</label>
+    <input type="text" name="ManufactureYear" value="{{ .CarModel.ManufactureYear }}">
+  </div>
+  <button class="btn">Save</button>
+  {{ if .CarModel.ID }}
+  <button class="btn" hx-get="/car_models/{{ .CarModel.ID }}">Cancel</button>
+  {{ end }}
+  <span class="htmx-indicator">Loading...</span>
+</form>
+{{ end }}
