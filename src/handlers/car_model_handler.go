@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/fredmessias43/car-hub/models"
+	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

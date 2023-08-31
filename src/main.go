@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/fredmessias43/car-hub/contracts"
-	"github.com/fredmessias43/car-hub/handlers"
-	"github.com/fredmessias43/car-hub/models"
+	"github.com/fredmessias43/car-hub/src/contracts"
+	"github.com/fredmessias43/car-hub/src/handlers"
+	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/gertd/go-pluralize"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
@@ -49,7 +49,7 @@ func main() {
 	router.SetFuncMap(template.FuncMap{
 		"toMapStringAny": toMapStringAny,
 	})
-	router.LoadHTMLGlob("templates/**/*")
+	router.LoadHTMLGlob("./src/resources/templates/**/**/*.html")
 
 	contactHandler := handlers.ContactHandler{DB: db}
 	routerResource(router, "contact", &contactHandler)
@@ -86,7 +86,7 @@ func routerResource(router *gin.Engine, key string, handler contracts.Handler) {
 }
 
 func configDb() (db *gorm.DB, err error) {
-	dbLog, _ := os.Create("./logs/db.log")
+	dbLog, _ := os.Create("./src/logs/db.log")
 	out := io.MultiWriter(dbLog)
 	newLogger := logger.New(
 		log.New(out, "\n", log.LstdFlags), // io writer
@@ -98,7 +98,7 @@ func configDb() (db *gorm.DB, err error) {
 		},
 	)
 
-	db, err = gorm.Open(sqlite.Open("./database/db.sqlite"), &gorm.Config{
+	db, err = gorm.Open(sqlite.Open("./src/database/db.sqlite"), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {

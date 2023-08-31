@@ -1,22 +1,25 @@
-{{ define "pages/brands/index" }}
+{{ define "pages/manufacturers/index" }}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ .Title }}</title>
 </head>
+
 <body>
 
-  {{ template "partials/brands/upsert-form" }}
+  {{ template "partials/manufacturers/upsert-form" }}
 
-  <div id="brand-list">
-    {{ range .Brands }}
-      {{ template "partials/brands/index-card" toMapStringAny "Brand" . }}
+  <div id="manufacturer-list">
+    {{ range .Manufacturers }}
+    {{ template "partials/manufacturers/index-card" toMapStringAny "Manufacturer" . }}
     {{ end }}
   </div>
 
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
 </body>
+
 </html>
 {{ end }}
