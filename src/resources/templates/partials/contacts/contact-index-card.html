@@ -4,7 +4,7 @@
   <div><label>Last Name</label>: {{ .Contact.LastName }}</div>
   <div><label>Email</label>: {{ .Contact.Email }}</div>
   <button hx-get="/contacts/{{ .Contact.ID }}/edit" class="btn btn-primary">Edit</button>
-  <button class="btn btn-danger" hx-delete="/contacts/{{ .Contact.ID }}">Delete</button>
+  <button class="btn btn-error" hx-delete="/contacts/{{ .Contact.ID }}">Delete</button>
   <span class="htmx-indicator">Loading...</span>
 </div>
 {{ end }}

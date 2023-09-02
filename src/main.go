@@ -51,6 +51,8 @@ func main() {
 	})
 	router.LoadHTMLGlob("./src/resources/templates/**/**/*.html")
 
+	router.Static("/assets", "./src/public/assets")
+
 	contactHandler := handlers.ContactHandler{DB: db}
 	routerResource(router, "contact", &contactHandler)
 

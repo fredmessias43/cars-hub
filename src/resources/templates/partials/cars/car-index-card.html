@@ -7,7 +7,7 @@
   <div><label>FuelType</label>: {{ .Car.FuelType }}</div>
   <div><label>Transmission</label>: {{ .Car.Transmission }}</div>
   <button hx-get="/cars/{{ .Car.ID }}/edit" class="btn btn-primary">Edit</button>
-  <button class="btn btn-danger" hx-delete="/cars/{{ .Car.ID }}">Delete</button>
+  <button class="btn btn-error" hx-delete="/cars/{{ .Car.ID }}">Delete</button>
   <span class="htmx-indicator">Loading...</span>
 </div>
 {{ end }}

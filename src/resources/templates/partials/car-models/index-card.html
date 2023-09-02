@@ -4,7 +4,7 @@
   <div><label>BrandID</label>: {{ .CarModel.BrandID }}</div>
   <div><label>ManufactureYear</label>: {{ .CarModel.ManufactureYear }}</div>
   <button hx-get="/car_models/{{ .CarModel.ID }}/edit" class="btn btn-primary">Edit</button>
-  <button class="btn btn-danger" hx-delete="/car_models/{{ .CarModel.ID }}">Delete</button>
+  <button class="btn btn-error" hx-delete="/car_models/{{ .CarModel.ID }}">Delete</button>
   <span class="htmx-indicator">Loading...</span>
 </div>
 {{ end }}

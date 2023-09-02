@@ -5,7 +5,7 @@
   <div><label>Specifications</label>: {{ .CarModelVersion.Specifications }}</div>
   <div><label>Features</label>: {{ .CarModelVersion.Features }}</div>
   <button hx-get="/car_model_versions/{{ .CarModelVersion.ID }}/edit" class="btn btn-primary">Edit</button>
-  <button class="btn btn-danger" hx-delete="/car_model_versions/{{ .CarModelVersion.ID }}">Delete</button>
+  <button class="btn btn-error" hx-delete="/car_model_versions/{{ .CarModelVersion.ID }}">Delete</button>
   <span class="htmx-indicator">Loading...</span>
 </div>
 {{ end }}
