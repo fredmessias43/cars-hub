@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"io"
 	"log"
 	"os"
@@ -11,33 +10,11 @@ import (
 	"github.com/fredmessias43/car-hub/src/handlers"
 	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/gertd/go-pluralize"
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
-
-func toMapStringAny(args ...any) map[string]any {
-	var stringValues []string
-	var anyValues []any
-
-	for i := 0; i < len(args); i = i + 2 {
-		arg := args[i]
-		stringValues = append(stringValues, arg.(string))
-	}
-
-	for i := 1; i < len(args); i = i + 2 {
-		arg := args[i]
-		anyValues = append(anyValues, arg.(any))
-	}
-
-	newMap := map[string]any{}
-	for i := 0; i < len(stringValues); i++ {
-		newMap[stringValues[i]] = anyValues[i]
-	}
-
-	return newMap
-}
 
 func main() {
 	db, err := configDb()
@@ -45,46 +22,42 @@ func main() {
 		panic("failed to connect database: " + err.Error())
 	}
 
-	router := gin.Default()
-	router.SetFuncMap(template.FuncMap{
-		"toMapStringAny": toMapStringAny,
-	})
-	router.LoadHTMLGlob("./src/resources/templates/**/**/*.html")
-
-	router.Static("/assets", "./src/public/assets")
+	e := echo.New()
+	// e.Renderer = &EchoTemplRenderer{}
+	e.Static("/assets", "./src/public/assets")
 
 	contactHandler := handlers.ContactHandler{DB: db}
-	routerResource(router, "contact", &contactHandler)
+	routerResource(e, "contact", &contactHandler)
 
-	manufacturerHandler := handlers.ManufacturerHandler{DB: db}
-	routerResource(router, "manufacturer", &manufacturerHandler)
+	// manufacturerHandler := handlers.ManufacturerHandler{DB: db}
+	// routerResource(e, "manufacturer", &manufacturerHandler)
 
-	brandHandler := handlers.BrandHandler{DB: db}
-	routerResource(router, "brand", &brandHandler)
+	// brandHandler := handlers.BrandHandler{DB: db}
+	// routerResource(e, "brand", &brandHandler)
 
-	carModelHandler := handlers.CarModelHandler{DB: db}
-	routerResource(router, "car_model", &carModelHandler)
+	// carModelHandler := handlers.CarModelHandler{DB: db}
+	// routerResource(e, "car_model", &carModelHandler)
 
-	carModelVersionHandler := handlers.CarModelVersionHandler{DB: db}
-	routerResource(router, "car_model_version", &carModelVersionHandler)
+	// carModelVersionHandler := handlers.CarModelVersionHandler{DB: db}
+	// routerResource(e, "car_model_version", &carModelVersionHandler)
 
-	carHandler := handlers.CarHandler{DB: db}
-	routerResource(router, "car", &carHandler)
+	// carHandler := handlers.CarHandler{DB: db}
+	// routerResource(e, "car", &carHandler)
 
-	router.Run(":8080")
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
-func routerResource(router *gin.Engine, key string, handler contracts.Handler) {
+func routerResource(e *echo.Echo, key string, handler contracts.Handler) {
 	singular := pluralize.NewClient().Singular(key)
 	plural := pluralize.NewClient().Plural(key)
 
-	router.GET("/"+plural+"", handler.Index)
-	router.GET("/"+plural+"/:"+singular+"", handler.Show)
-	router.GET("/"+plural+"/:"+singular+"/edit", handler.Edit)
-	router.GET("/"+plural+"/create", handler.Create)
-	router.POST("/"+plural+"", handler.Store)
-	router.PUT("/"+plural+"/:"+singular+"", handler.Update)
-	router.DELETE("/"+plural+"/:"+singular+"", handler.Delete)
+	e.GET("/"+plural+"", handler.Index)
+	e.GET("/"+plural+"/:"+singular+"", handler.Show)
+	e.GET("/"+plural+"/:"+singular+"/edit", handler.Edit)
+	e.GET("/"+plural+"/create", handler.Create)
+	e.POST("/"+plural+"", handler.Store)
+	e.PUT("/"+plural+"/:"+singular+"", handler.Update)
+	e.DELETE("/"+plural+"/:"+singular+"", handler.Delete)
 }
 
 func configDb() (db *gorm.DB, err error) {

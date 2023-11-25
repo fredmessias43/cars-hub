@@ -1,0 +1,88 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+import "strconv"
+
+templ ContactsIndexPage(title string, contacts []models.Contact) {
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{ title }</title>
+  </head>
+
+  <body>
+
+    @ContactUpsertForm(models.Contact{})
+
+    <div id="contact-list">
+      for _,contact := range contacts {
+        @ContactIndexCard(contact)
+      }
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  </body>
+
+  </html>
+}
+
+templ ContactUpsertForm(contact models.Contact) {
+  <form 
+    if (contact.ID != 0) {
+      hx-put={getEndpoint("update", contact.ID)}
+      hx-target="this" 
+      hx-swap="outerHTML"
+    }
+    else {
+      hx-post={getEndpoint("store", contact.ID)}
+      hx-target="#contact-list" 
+      hx-swap="beforeend"
+    }
+  >
+    <div>
+      <label>First Name</label>
+      <input type="text" name="FirstName" value={ contact.FirstName } />
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" name="LastName" value={ contact.LastName } />
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" name="Email" value={ contact.Email } />
+    </div>
+    <button class="btn">Save</button>
+    if (contact.ID != 0) {
+    <button class="btn" hx-get={getEndpoint("show", contact.ID)}>Cancel</button>
+    }
+    <span class="htmx-indicator">Loading...</span>
+  </form>
+}
+
+templ ContactIndexCard(contact models.Contact) {
+  <div hx-target="this" hx-swap="outerHTML">
+    <div><label>First Name</label>: { contact.FirstName }</div>
+    <div><label>Last Name</label>: { contact.LastName }</div>
+    <div><label>Email</label>: { contact.Email }</div>
+    <button hx-get={getEndpoint("edit", contact.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("delete", contact.ID)}>Delete</button>
+    <span class="htmx-indicator">Loading...</span>
+  </div>
+}
+
+func getEndpoint(verb string, id int) string {
+  endpoints := map[string]string{
+    "index" : "/contacts",
+    "show" : "/contacts/" + strconv.Itoa(id) + "",
+    "edit" : "/contacts/" + strconv.Itoa(id) + "/edit",
+    "create" : "/contacts/create",
+    "store" : "/contacts",
+    "update" : "/contacts/" + strconv.Itoa(id) + "",
+    "delete" : "/contacts/" + strconv.Itoa(id) + "",
+  }
+  
+  return endpoints[verb]
+}
