@@ -1,0 +1,79 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+import "fmt"
+
+templ CarModelVersionsIndexPage(title string, car_model_versions []models.CarModelVersion) {
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{ title }</title>
+  </head>
+
+  <body>
+
+    @CarModelVersionUpsertForm(models.CarModelVersion{})
+
+    <div id="car_model-list">
+      for _,car_model := range car_model_versions {
+        @CarModelVersionIndexCard(car_model)
+      }
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  </body>
+
+  </html>
+}
+
+templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion) {
+  <form 
+    if (carModelVersion.ID != 0) {
+      hx-put={getEndpoint("car_model_versions", "update", carModelVersion.ID)}
+      hx-target="this" 
+      hx-swap="outerHTML"
+    }
+    else {
+      hx-post={getEndpoint("car_model_versions", "store", carModelVersion.ID)}
+      hx-target="#car_model-list" 
+      hx-swap="beforeend"
+    }
+  >
+    <div>
+      <label>Name</label>
+      <input type="text" name="Name" value={ (carModelVersion.Name) } />
+    </div>
+    <div class="form-group">
+      <label>ModelID</label>
+      <input type="text" name="ModelID" value={ fmt.Sprintf("%d", carModelVersion.ModelID) } />
+    </div>
+    <div class="form-group">
+      <label>Specifications</label>
+      <input type="email" name="Specifications" value={ (carModelVersion.Specifications) } />
+    </div>
+    <div class="form-group">
+      <label>Features</label>
+      <input type="email" name="Features" value={ (carModelVersion.Features) } />
+    </div>
+    <button class="btn">Save</button>
+    if (carModelVersion.ID != 0) {
+    <button class="btn" hx-get={getEndpoint("car_model_versions", "show", carModelVersion.ID)}>Cancel</button>
+    }
+    <span class="htmx-indicator">Loading...</span>
+  </form>
+}
+
+templ CarModelVersionIndexCard(carModelVersion models.CarModelVersion) {
+  <div hx-target="this" hx-swap="outerHTML">
+    <div><label>Name</label>: { (carModelVersion.Name) }</div>
+    <div><label>ModelID</label>: { fmt.Sprintf("%d", carModelVersion.ModelID) }</div>
+    <div><label>Specifications</label>: { (carModelVersion.Specifications) }</div>
+    <div><label>Features</label>: { (carModelVersion.Features) }</div>
+    <button hx-get={getEndpoint("car_model_versions", "edit", carModelVersion.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("car_model_versions", "delete", carModelVersion.ID)}>Delete</button>
+    <span class="htmx-indicator">Loading...</span>
+  </div>
+}

@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/fredmessias43/car-hub/src/models"
-	"github.com/gin-gonic/gin"
+	"github.com/fredmessias43/car-hub/src/templates"
+	"github.com/fredmessias43/car-hub/src/utils"
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -13,82 +14,67 @@ type CarHandler struct {
 	DB *gorm.DB
 }
 
-func (h *CarHandler) Index(c *gin.Context) {
+func (h *CarHandler) Index(c echo.Context) error {
 	cars := []models.Car{}
 	h.DB.Find(&cars)
 
-	c.HTML(http.StatusOK, "pages/cars/index", gin.H{
-		"Title": "Cars page",
-		"Cars":  cars,
-	})
+	return utils.RenderTemplToHTML(c, templates.CarsIndexPage("Cars page", cars))
 }
 
-func (h *CarHandler) Show(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("car"))
+func (h *CarHandler) Show(c echo.Context) error {
+	ID, _ := strconv.Atoi(c.Param(("car")))
 
 	car := models.Car{}
 	_ = h.DB.Find(&car, ID)
 
-	c.HTML(http.StatusOK, "partials/cars/index-card", gin.H{
-		"Car": car.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.CarIndexCard(car))
 }
 
-func (h *CarHandler) Edit(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("car"))
+func (h *CarHandler) Edit(c echo.Context) error {
+	ID, _ := strconv.Atoi(c.Param(("car")))
 
 	car := models.Car{}
 	_ = h.DB.Find(&car, ID)
 
-	c.HTML(http.StatusOK, "partials/cars/upsert-form", gin.H{
-		"Car": car.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.CarUpsertForm(car))
 }
 
-func (h *CarHandler) Create(c *gin.Context) {
+func (h *CarHandler) Create(c echo.Context) error {
 	car := models.Car{}
-	c.HTML(http.StatusOK, "partials/cars/upsert-form", gin.H{
-		"Car": car.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.CarUpsertForm(car))
 }
 
-func (h *CarHandler) Store(c *gin.Context) {
+func (h *CarHandler) Store(c echo.Context) error {
 	var car models.Car
 
-	if err := c.ShouldBind(&car); err != nil {
-		return
+	if err := c.Bind(&car); err != nil {
+		return err
 	}
-
-	_ = h.DB.Find(&car.CarModelVersion, car.ModelVersionID)
 
 	_ = h.DB.Create(&car)
 
-	c.HTML(http.StatusOK, "partials/cars/index-card", gin.H{
-		"Car": car.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.CarIndexCard(car))
 }
 
-func (h *CarHandler) Update(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("car"))
+func (h *CarHandler) Update(c echo.Context) error {
+	ID, _ := strconv.Atoi(c.Param(("car")))
 
 	car := models.Car{}
 	_ = h.DB.Find(&car, ID)
 
-	if err := c.ShouldBind(&car); err != nil {
-		return
+	if err := c.Bind(&car); err != nil {
+		return err
 	}
 
 	h.DB.Model(&car).Where("ID = ?", ID).Updates(&car)
 
-	c.HTML(http.StatusOK, "partials/cars/index-card", gin.H{
-		"Car": car.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.CarIndexCard(car))
 }
 
-func (h *CarHandler) Delete(c *gin.Context) {
+func (h *CarHandler) Delete(c echo.Context) error {
 	ID, _ := strconv.Atoi(c.Param("car"))
 
 	h.DB.Delete(&models.Car{}, ID)
 
-	return
+	return nil
 }

@@ -1,0 +1,68 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+
+templ ManufacturersIndexPage(title string, manufacturers []models.Manufacturer) {
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{ title }</title>
+  </head>
+
+  <body>
+
+    @ManufacturerUpsertForm(models.Manufacturer{})
+
+    <div id="manufacturer-list">
+      for _,manufacturer := range manufacturers {
+        @ManufacturerIndexCard(manufacturer)
+      }
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  </body>
+
+  </html>
+}
+
+templ ManufacturerUpsertForm(manufacturer models.Manufacturer) {
+  <form 
+    if (manufacturer.ID != 0) {
+      hx-put={getEndpoint("manufacturers", "update", manufacturer.ID)}
+      hx-target="this" 
+      hx-swap="outerHTML"
+    }
+    else {
+      hx-post={getEndpoint("manufacturers", "store", manufacturer.ID)}
+      hx-target="#manufacturer-list" 
+      hx-swap="beforeend"
+    }
+  >
+    <div>
+      <label>First Name</label>
+      <input type="text" name="Name" value={ manufacturer.Name } />
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" name="CountryOrigin" value={ manufacturer.CountryOrigin } />
+    </div>
+    <button class="btn">Save</button>
+    if (manufacturer.ID != 0) {
+    <button class="btn" hx-get={getEndpoint("manufacturers", "show", manufacturer.ID)}>Cancel</button>
+    }
+    <span class="htmx-indicator">Loading...</span>
+  </form>
+}
+
+templ ManufacturerIndexCard(manufacturer models.Manufacturer) {
+  <div hx-target="this" hx-swap="outerHTML">
+    <div><label>First Name</label>: { manufacturer.Name }</div>
+    <div><label>Last Name</label>: { manufacturer.CountryOrigin }</div>
+    <button hx-get={getEndpoint("manufacturers", "edit", manufacturer.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("manufacturers", "delete", manufacturer.ID)}>Delete</button>
+    <span class="htmx-indicator">Loading...</span>
+  </div>
+}

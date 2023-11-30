@@ -1,0 +1,69 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+import "fmt"
+
+templ BrandsIndexPage(title string, brands []models.Brand) {
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{ title }</title>
+  </head>
+
+  <body>
+
+    @BrandUpsertForm(models.Brand{})
+
+    <div id="brand-list">
+      for _,brand := range brands {
+        @BrandIndexCard(brand)
+      }
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  </body>
+
+  </html>
+}
+
+templ BrandUpsertForm(brand models.Brand) {
+  <form 
+    if (brand.ID != 0) {
+      hx-put={getEndpoint("brands", "update", brand.ID)}
+      hx-target="this" 
+      hx-swap="outerHTML"
+    }
+    else {
+      hx-post={getEndpoint("brands", "store", brand.ID)}
+      hx-target="#brand-list" 
+      hx-swap="beforeend"
+    }
+  >
+    <div>
+      <label>Name</label>
+      <input type="text" name="Name" value={ brand.Name } />
+    </div>
+    <div class="form-group">
+      <label>Manufacturer</label>
+      <input type="text" name="ManufacturerID" value={ fmt.Sprintf("%d", brand.ManufacturerID) } />
+    </div>
+    <button class="btn">Save</button>
+    if (brand.ID != 0) {
+    <button class="btn" hx-get={getEndpoint("brands", "show", brand.ID)}>Cancel</button>
+    }
+    <span class="htmx-indicator">Loading...</span>
+  </form>
+}
+
+templ BrandIndexCard(brand models.Brand) {
+  <div hx-target="this" hx-swap="outerHTML">
+    <div><label>Name</label>: { brand.Name }</div>
+    <div><label>Manufacturer</label>: { fmt.Sprintf("%d", brand.ManufacturerID) }</div>
+    <button hx-get={getEndpoint("brands", "edit", brand.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("brands", "delete", brand.ID)}>Delete</button>
+    <span class="htmx-indicator">Loading...</span>
+  </div>
+}

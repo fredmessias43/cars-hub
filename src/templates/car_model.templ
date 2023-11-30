@@ -1,0 +1,74 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+import "fmt"
+
+templ CarModelsIndexPage(title string, car_models []models.CarModel) {
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{ title }</title>
+  </head>
+
+  <body>
+
+    @CarModelUpsertForm(models.CarModel{})
+
+    <div id="car_model-list">
+      for _,car_model := range car_models {
+        @CarModelIndexCard(car_model)
+      }
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  </body>
+
+  </html>
+}
+
+templ CarModelUpsertForm(carModel models.CarModel) {
+  <form 
+    if (carModel.ID != 0) {
+      hx-put={getEndpoint("car_models", "update", carModel.ID)}
+      hx-target="this" 
+      hx-swap="outerHTML"
+    }
+    else {
+      hx-post={getEndpoint("car_models", "store", carModel.ID)}
+      hx-target="#car_model-list" 
+      hx-swap="beforeend"
+    }
+  >
+    <div>
+      <label>First Name</label>
+      <input type="text" name="BrandID" value={ fmt.Sprintf("%d", carModel.BrandID) } />
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" name="Name" value={ carModel.Name } />
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" name="ManufactureYear" value={ fmt.Sprintf("%d", carModel.ManufactureYear) } />
+    </div>
+    <button class="btn">Save</button>
+    if (carModel.ID != 0) {
+    <button class="btn" hx-get={getEndpoint("car_models", "show", carModel.ID)}>Cancel</button>
+    }
+    <span class="htmx-indicator">Loading...</span>
+  </form>
+}
+
+templ CarModelIndexCard(carModel models.CarModel) {
+  <div hx-target="this" hx-swap="outerHTML">
+    <div><label>BrandID</label>: { fmt.Sprintf("%d", carModel.BrandID) }</div>
+    <div><label>Name</label>: { carModel.Name }</div>
+    <div><label>ManufactureYear</label>: { fmt.Sprintf("%d", carModel.ManufactureYear) }</div>
+    <button hx-get={getEndpoint("car_models", "edit", carModel.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("car_models", "delete", carModel.ID)}>Delete</button>
+    <span class="htmx-indicator">Loading...</span>
+  </div>
+}

@@ -1,7 +1,6 @@
 package templates
 
 import "github.com/fredmessias43/car-hub/src/models"
-import "strconv"
 
 templ ContactsIndexPage(title string, contacts []models.Contact) {
   <!DOCTYPE html>
@@ -32,12 +31,12 @@ templ ContactsIndexPage(title string, contacts []models.Contact) {
 templ ContactUpsertForm(contact models.Contact) {
   <form 
     if (contact.ID != 0) {
-      hx-put={getEndpoint("update", contact.ID)}
+      hx-put={getEndpoint("contacts", "update", contact.ID)}
       hx-target="this" 
       hx-swap="outerHTML"
     }
     else {
-      hx-post={getEndpoint("store", contact.ID)}
+      hx-post={getEndpoint("contacts", "store", contact.ID)}
       hx-target="#contact-list" 
       hx-swap="beforeend"
     }
@@ -56,7 +55,7 @@ templ ContactUpsertForm(contact models.Contact) {
     </div>
     <button class="btn">Save</button>
     if (contact.ID != 0) {
-    <button class="btn" hx-get={getEndpoint("show", contact.ID)}>Cancel</button>
+    <button class="btn" hx-get={getEndpoint("contacts", "show", contact.ID)}>Cancel</button>
     }
     <span class="htmx-indicator">Loading...</span>
   </form>
@@ -67,22 +66,8 @@ templ ContactIndexCard(contact models.Contact) {
     <div><label>First Name</label>: { contact.FirstName }</div>
     <div><label>Last Name</label>: { contact.LastName }</div>
     <div><label>Email</label>: { contact.Email }</div>
-    <button hx-get={getEndpoint("edit", contact.ID)} class="btn btn-primary">Edit</button>
-    <button class="btn btn-error" hx-delete={getEndpoint("delete", contact.ID)}>Delete</button>
+    <button hx-get={getEndpoint("contacts", "edit", contact.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("contacts", "delete", contact.ID)}>Delete</button>
     <span class="htmx-indicator">Loading...</span>
   </div>
-}
-
-func getEndpoint(verb string, id int) string {
-  endpoints := map[string]string{
-    "index" : "/contacts",
-    "show" : "/contacts/" + strconv.Itoa(id) + "",
-    "edit" : "/contacts/" + strconv.Itoa(id) + "/edit",
-    "create" : "/contacts/create",
-    "store" : "/contacts",
-    "update" : "/contacts/" + strconv.Itoa(id) + "",
-    "delete" : "/contacts/" + strconv.Itoa(id) + "",
-  }
-  
-  return endpoints[verb]
 }

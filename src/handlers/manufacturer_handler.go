@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/fredmessias43/car-hub/src/models"
-	"github.com/gin-gonic/gin"
+	"github.com/fredmessias43/car-hub/src/templates"
+	"github.com/fredmessias43/car-hub/src/utils"
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -13,80 +14,67 @@ type ManufacturerHandler struct {
 	DB *gorm.DB
 }
 
-func (h *ManufacturerHandler) Index(c *gin.Context) {
+func (h *ManufacturerHandler) Index(c echo.Context) error {
 	manufacturers := []models.Manufacturer{}
 	h.DB.Find(&manufacturers)
 
-	c.HTML(http.StatusOK, "pages/manufacturers/index", gin.H{
-		"Title":         "Manufacturers page",
-		"Manufacturers": manufacturers,
-	})
+	return utils.RenderTemplToHTML(c, templates.ManufacturersIndexPage("Manufacturers page", manufacturers))
 }
 
-func (h *ManufacturerHandler) Show(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("manufacturer"))
+func (h *ManufacturerHandler) Show(c echo.Context) error {
+	ID, _ := strconv.Atoi(c.Param(("manufacturer")))
 
 	manufacturer := models.Manufacturer{}
 	_ = h.DB.Find(&manufacturer, ID)
 
-	c.HTML(http.StatusOK, "partials/manufacturers/index-card", gin.H{
-		"Manufacturer": manufacturer.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.ManufacturerIndexCard(manufacturer))
 }
 
-func (h *ManufacturerHandler) Edit(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("manufacturer"))
+func (h *ManufacturerHandler) Edit(c echo.Context) error {
+	ID, _ := strconv.Atoi(c.Param(("manufacturer")))
 
 	manufacturer := models.Manufacturer{}
 	_ = h.DB.Find(&manufacturer, ID)
 
-	c.HTML(http.StatusOK, "partials/manufacturers/upsert-form", gin.H{
-		"Manufacturer": manufacturer.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.ManufacturerUpsertForm(manufacturer))
 }
 
-func (h *ManufacturerHandler) Create(c *gin.Context) {
+func (h *ManufacturerHandler) Create(c echo.Context) error {
 	manufacturer := models.Manufacturer{}
-	c.HTML(http.StatusOK, "partials/manufacturers/upsert-form", gin.H{
-		"Manufacturer": manufacturer.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.ManufacturerUpsertForm(manufacturer))
 }
 
-func (h *ManufacturerHandler) Store(c *gin.Context) {
+func (h *ManufacturerHandler) Store(c echo.Context) error {
 	var manufacturer models.Manufacturer
 
-	if err := c.ShouldBind(&manufacturer); err != nil {
-		return
+	if err := c.Bind(&manufacturer); err != nil {
+		return err
 	}
 
 	_ = h.DB.Create(&manufacturer)
 
-	c.HTML(http.StatusOK, "partials/manufacturers/index-card", gin.H{
-		"Manufacturer": manufacturer.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.ManufacturerIndexCard(manufacturer))
 }
 
-func (h *ManufacturerHandler) Update(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("manufacturer"))
+func (h *ManufacturerHandler) Update(c echo.Context) error {
+	ID, _ := strconv.Atoi(c.Param(("manufacturer")))
 
 	manufacturer := models.Manufacturer{}
 	_ = h.DB.Find(&manufacturer, ID)
 
-	if err := c.ShouldBind(&manufacturer); err != nil {
-		return
+	if err := c.Bind(&manufacturer); err != nil {
+		return err
 	}
 
 	h.DB.Model(&manufacturer).Where("ID = ?", ID).Updates(&manufacturer)
 
-	c.HTML(http.StatusOK, "partials/manufacturers/index-card", gin.H{
-		"Manufacturer": manufacturer.ToMap(),
-	})
+	return utils.RenderTemplToHTML(c, templates.ManufacturerIndexCard(manufacturer))
 }
 
-func (h *ManufacturerHandler) Delete(c *gin.Context) {
+func (h *ManufacturerHandler) Delete(c echo.Context) error {
 	ID, _ := strconv.Atoi(c.Param("manufacturer"))
 
 	h.DB.Delete(&models.Manufacturer{}, ID)
 
-	return
+	return nil
 }

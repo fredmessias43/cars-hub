@@ -1,0 +1,89 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+import "fmt"
+
+templ CarsIndexPage(title string, cars []models.Car) {
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{ title }</title>
+  </head>
+
+  <body>
+
+    @CarUpsertForm(models.Car{})
+
+    <div id="car-list">
+      for _,car := range cars {
+        @CarIndexCard(car)
+      }
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  </body>
+
+  </html>
+}
+
+templ CarUpsertForm(car models.Car) {
+  <form 
+    if (car.ID != 0) {
+      hx-put={getEndpoint("cars", "update", car.ID)}
+      hx-target="this" 
+      hx-swap="outerHTML"
+    }
+    else {
+      hx-post={getEndpoint("cars", "store", car.ID)}
+      hx-target="#car-list" 
+      hx-swap="beforeend"
+    }
+  >
+    <div>
+      <label>ModelVersionID</label>
+      <input type="text" name="ModelVersionID" value={ fmt.Sprintf("%d", car.ModelVersionID) } />
+    </div>
+    <div>
+      <label>Color</label>
+      <input type="text" name="Color" value={ car.Color } />
+    </div>
+    <div>
+      <label>Mileage</label>
+      <input type="text" name="Mileage" value={ fmt.Sprintf("%d", car.Mileage) } />
+    </div>
+    <div>
+      <label>Price</label>
+      <input type="text" name="Price" value={ fmt.Sprintf("%f", car.Price) } />
+    </div>
+    <div>
+      <label>FuelType</label>
+      <input type="text" name="FuelType" value={ car.FuelType } />
+    </div>
+    <div>
+      <label>Transmission</label>
+      <input type="text" name="Transmission" value={ car.Transmission } />
+    </div>
+    <button class="btn">Save</button>
+    if (car.ID != 0) {
+    <button class="btn" hx-get={getEndpoint("cars", "show", car.ID)}>Cancel</button>
+    }
+    <span class="htmx-indicator">Loading...</span>
+  </form>
+}
+
+templ CarIndexCard(car models.Car) {
+  <div hx-target="this" hx-swap="outerHTML">
+    <div><label>ModelVersionID</label>: { fmt.Sprintf("%d", car.ModelVersionID) }</div>
+    <div><label>Color</label>: { car.Color }</div>
+    <div><label>Mileage</label>: { fmt.Sprintf("%d", car.Mileage) }</div>
+    <div><label>Price</label>: { fmt.Sprintf("%f", car.Price) }</div>
+    <div><label>FuelType</label>: { car.FuelType }</div>
+    <div><label>Transmission</label>: { car.Transmission }</div>
+    <button hx-get={getEndpoint("cars", "edit", car.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("cars", "delete", car.ID)}>Delete</button>
+    <span class="htmx-indicator">Loading...</span>
+  </div>
+}
