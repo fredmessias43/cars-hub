@@ -3,29 +3,15 @@ package templates
 import "github.com/fredmessias43/car-hub/src/models"
 
 templ ContactsIndexPage(title string, contacts []models.Contact) {
-  <!DOCTYPE html>
-  <html lang="en">
-
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{ title }</title>
-  </head>
-
-  <body>
-
-    @ContactUpsertForm(models.Contact{})
+  @BaseComponent(title) {
+		@ContactUpsertForm(models.Contact{})
 
     <div id="contact-list">
       for _,contact := range contacts {
         @ContactIndexCard(contact)
       }
     </div>
-
-    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  </body>
-
-  </html>
+	}
 }
 
 templ ContactUpsertForm(contact models.Contact) {
@@ -41,19 +27,19 @@ templ ContactUpsertForm(contact models.Contact) {
       hx-swap="beforeend"
     }
   >
-    <div>
-      <label>First Name</label>
-      <input type="text" name="FirstName" value={ contact.FirstName } />
+    <div class="form-control">
+      <label class="label" >First Name</label>
+      <input class="input input-bordered" type="text" name="FirstName" value={ contact.FirstName } />
     </div>
-    <div class="form-group">
-      <label>Last Name</label>
-      <input type="text" name="LastName" value={ contact.LastName } />
+    <div class="form-control">
+      <label class="label" >Last Name</label>
+      <input class="input input-bordered" type="text" name="LastName" value={ contact.LastName } />
     </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" name="Email" value={ contact.Email } />
+    <div class="form-control">
+      <label class="label" >Email</label>
+      <input class="input input-bordered" type="email" name="Email" value={ contact.Email } />
     </div>
-    <button class="btn">Save</button>
+    <button class="btn mt-3">Save</button>
     if (contact.ID != 0) {
     <button class="btn" hx-get={getEndpoint("contacts", "show", contact.ID)}>Cancel</button>
     }

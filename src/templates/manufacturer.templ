@@ -3,29 +3,15 @@ package templates
 import "github.com/fredmessias43/car-hub/src/models"
 
 templ ManufacturersIndexPage(title string, manufacturers []models.Manufacturer) {
-  <!DOCTYPE html>
-  <html lang="en">
-
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{ title }</title>
-  </head>
-
-  <body>
-
-    @ManufacturerUpsertForm(models.Manufacturer{})
+  @BaseComponent(title) {
+		@ManufacturerUpsertForm(models.Manufacturer{})
 
     <div id="manufacturer-list">
       for _,manufacturer := range manufacturers {
         @ManufacturerIndexCard(manufacturer)
       }
     </div>
-
-    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  </body>
-
-  </html>
+	}
 }
 
 templ ManufacturerUpsertForm(manufacturer models.Manufacturer) {
@@ -41,15 +27,15 @@ templ ManufacturerUpsertForm(manufacturer models.Manufacturer) {
       hx-swap="beforeend"
     }
   >
-    <div>
-      <label>First Name</label>
-      <input type="text" name="Name" value={ manufacturer.Name } />
+    <div class="form-control">
+      <label class="label" >First Name</label>
+      <input class="input input-bordered" type="text" name="Name" value={ manufacturer.Name } />
     </div>
-    <div class="form-group">
-      <label>Last Name</label>
-      <input type="text" name="CountryOrigin" value={ manufacturer.CountryOrigin } />
+    <div class="form-control">
+      <label class="label" >Last Name</label>
+      <input class="input input-bordered" type="text" name="CountryOrigin" value={ manufacturer.CountryOrigin } />
     </div>
-    <button class="btn">Save</button>
+    <button class="btn mt-3">Save</button>
     if (manufacturer.ID != 0) {
     <button class="btn" hx-get={getEndpoint("manufacturers", "show", manufacturer.ID)}>Cancel</button>
     }

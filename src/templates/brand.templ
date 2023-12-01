@@ -4,29 +4,15 @@ import "github.com/fredmessias43/car-hub/src/models"
 import "fmt"
 
 templ BrandsIndexPage(title string, brands []models.Brand) {
-  <!DOCTYPE html>
-  <html lang="en">
-
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{ title }</title>
-  </head>
-
-  <body>
-
-    @BrandUpsertForm(models.Brand{})
+  @BaseComponent(title) {
+		@BrandUpsertForm(models.Brand{})
 
     <div id="brand-list">
       for _,brand := range brands {
         @BrandIndexCard(brand)
       }
     </div>
-
-    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  </body>
-
-  </html>
+	}
 }
 
 templ BrandUpsertForm(brand models.Brand) {
@@ -42,15 +28,15 @@ templ BrandUpsertForm(brand models.Brand) {
       hx-swap="beforeend"
     }
   >
-    <div>
-      <label>Name</label>
-      <input type="text" name="Name" value={ brand.Name } />
+    <div class="form-control">
+      <label class="label" >Name</label>
+      <input class="input input-bordered" type="text" name="Name" value={ brand.Name } />
     </div>
-    <div class="form-group">
-      <label>Manufacturer</label>
-      <input type="text" name="ManufacturerID" value={ fmt.Sprintf("%d", brand.ManufacturerID) } />
+    <div class="form-control">
+      <label class="label" >Manufacturer</label>
+      <input class="input input-bordered" type="text" name="ManufacturerID" value={ fmt.Sprintf("%d", brand.ManufacturerID) } />
     </div>
-    <button class="btn">Save</button>
+    <button class="btn mt-3">Save</button>
     if (brand.ID != 0) {
     <button class="btn" hx-get={getEndpoint("brands", "show", brand.ID)}>Cancel</button>
     }

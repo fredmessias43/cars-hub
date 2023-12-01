@@ -7,4 +7,4 @@ mix.disableNotifications();
 mix.setPublicPath("./src/public");
 
 mix.js(`${res_base_path}/js/index.js`, `${dist_base_path}/js/`);
-mix.css(`${res_base_path}/css/index.css`, `${dist_base_path}/css/`);
+mix.postCss(`${res_base_path}/css/index.css`, `${dist_base_path}/css/`);

@@ -4,29 +4,15 @@ import "github.com/fredmessias43/car-hub/src/models"
 import "fmt"
 
 templ CarsIndexPage(title string, cars []models.Car) {
-  <!DOCTYPE html>
-  <html lang="en">
-
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{ title }</title>
-  </head>
-
-  <body>
-
-    @CarUpsertForm(models.Car{})
+  @BaseComponent(title) {
+		@CarUpsertForm(models.Car{})
 
     <div id="car-list">
       for _,car := range cars {
         @CarIndexCard(car)
       }
     </div>
-
-    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  </body>
-
-  </html>
+	}
 }
 
 templ CarUpsertForm(car models.Car) {
@@ -42,31 +28,31 @@ templ CarUpsertForm(car models.Car) {
       hx-swap="beforeend"
     }
   >
-    <div>
-      <label>ModelVersionID</label>
-      <input type="text" name="ModelVersionID" value={ fmt.Sprintf("%d", car.ModelVersionID) } />
+    <div class="form-control">
+      <label class="label" >ModelVersionID</label>
+      <input class="input input-bordered" type="text" name="ModelVersionID" value={ fmt.Sprintf("%d", car.ModelVersionID) } />
     </div>
-    <div>
-      <label>Color</label>
-      <input type="text" name="Color" value={ car.Color } />
+    <div class="form-control">
+      <label class="label" >Color</label>
+      <input class="input input-bordered" type="text" name="Color" value={ car.Color } />
     </div>
-    <div>
-      <label>Mileage</label>
-      <input type="text" name="Mileage" value={ fmt.Sprintf("%d", car.Mileage) } />
+    <div class="form-control">
+      <label class="label" >Mileage</label>
+      <input class="input input-bordered" type="text" name="Mileage" value={ fmt.Sprintf("%d", car.Mileage) } />
     </div>
-    <div>
-      <label>Price</label>
-      <input type="text" name="Price" value={ fmt.Sprintf("%f", car.Price) } />
+    <div class="form-control">
+      <label class="label" >Price</label>
+      <input class="input input-bordered" type="text" name="Price" value={ fmt.Sprintf("%f", car.Price) } />
     </div>
-    <div>
-      <label>FuelType</label>
-      <input type="text" name="FuelType" value={ car.FuelType } />
+    <div class="form-control">
+      <label class="label" >FuelType</label>
+      <input class="input input-bordered" type="text" name="FuelType" value={ car.FuelType } />
     </div>
-    <div>
-      <label>Transmission</label>
-      <input type="text" name="Transmission" value={ car.Transmission } />
+    <div class="form-control">
+      <label class="label" >Transmission</label>
+      <input class="input input-bordered" type="text" name="Transmission" value={ car.Transmission } />
     </div>
-    <button class="btn">Save</button>
+    <button class="btn mt-3">Save</button>
     if (car.ID != 0) {
     <button class="btn" hx-get={getEndpoint("cars", "show", car.ID)}>Cancel</button>
     }

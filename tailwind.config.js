@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./src/resources/**/*.{html,css,js}",
+    "./src/templates/**/*.templ",
   ],
   theme: {
     extend: {},
@@ -11,7 +12,7 @@ module.exports = {
   // daisyUI config (optional - here are the default values)
   daisyui: {
     themes: [
-      "light", "dark",
+      "light", "dark", "emerald"
       // {
         // "cars-hub": {
           // "primary": "#ea580c",

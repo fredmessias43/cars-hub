@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./reset.css";
+@import "./layouts.css";
 
 .htmx-indicator {
   display: none;

@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -25,6 +26,10 @@ func main() {
 	e := echo.New()
 	// e.Renderer = &EchoTemplRenderer{}
 	e.Static("/assets", "./src/public/assets")
+
+	e.GET("/", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/cars")
+	})
 
 	contactHandler := handlers.ContactHandler{DB: db}
 	routerResource(e, "contact", &contactHandler)
