@@ -11,7 +11,7 @@ type Car struct {
 	FuelType        string          `json:"fuel_type"`
 	Transmission    string          `json:"transmission"`
 	ModelVersionID  int             `json:"model_version_id"`
-	CarModelVersion CarModelVersion `gorm:"foreignKey:ModelVersionID"`
+	CarModelVersion CarModelVersion `gorm:"foreignKey:ModelVersionID" form:"-"`
 }
 
 func (m *Car) ToMap() map[string]any {

@@ -10,8 +10,9 @@ import (
 	"github.com/fredmessias43/car-hub/src/contracts"
 	"github.com/fredmessias43/car-hub/src/handlers"
 	"github.com/fredmessias43/car-hub/src/models"
+	"github.com/fredmessias43/car-hub/src/renderer"
 	"github.com/gertd/go-pluralize"
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -23,46 +24,46 @@ func main() {
 		panic("failed to connect database: " + err.Error())
 	}
 
-	e := echo.New()
-	// e.Renderer = &EchoTemplRenderer{}
-	e.Static("/assets", "./src/public/assets")
+	router := gin.Default()
+	router.HTMLRender = &renderer.TemplRender{}
+	router.Static("/assets", "./src/public/assets")
 
-	e.GET("/", func(c echo.Context) error {
-		return c.Redirect(http.StatusMovedPermanently, "/cars")
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/cars")
 	})
 
 	contactHandler := handlers.ContactHandler{DB: db}
-	routerResource(e, "contact", &contactHandler)
+	routerResource(router, "contact", &contactHandler)
 
 	manufacturerHandler := handlers.ManufacturerHandler{DB: db}
-	routerResource(e, "manufacturer", &manufacturerHandler)
+	routerResource(router, "manufacturer", &manufacturerHandler)
 
 	brandHandler := handlers.BrandHandler{DB: db}
-	routerResource(e, "brand", &brandHandler)
+	routerResource(router, "brand", &brandHandler)
 
 	carModelHandler := handlers.CarModelHandler{DB: db}
-	routerResource(e, "car_model", &carModelHandler)
+	routerResource(router, "car_model", &carModelHandler)
 
 	carModelVersionHandler := handlers.CarModelVersionHandler{DB: db}
-	routerResource(e, "car_model_version", &carModelVersionHandler)
+	routerResource(router, "car_model_version", &carModelVersionHandler)
 
 	carHandler := handlers.CarHandler{DB: db}
-	routerResource(e, "car", &carHandler)
+	routerResource(router, "car", &carHandler)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	router.Run()
 }
 
-func routerResource(e *echo.Echo, key string, handler contracts.Handler) {
+func routerResource(router *gin.Engine, key string, handler contracts.Handler) {
 	singular := pluralize.NewClient().Singular(key)
 	plural := pluralize.NewClient().Plural(key)
 
-	e.GET("/"+plural+"", handler.Index)
-	e.GET("/"+plural+"/:"+singular+"", handler.Show)
-	e.GET("/"+plural+"/:"+singular+"/edit", handler.Edit)
-	e.GET("/"+plural+"/create", handler.Create)
-	e.POST("/"+plural+"", handler.Store)
-	e.PUT("/"+plural+"/:"+singular+"", handler.Update)
-	e.DELETE("/"+plural+"/:"+singular+"", handler.Delete)
+	router.GET("/"+plural+"", handler.Index)
+	router.GET("/"+plural+"/:"+singular+"", handler.Show)
+	router.GET("/"+plural+"/:"+singular+"/edit", handler.Edit)
+	router.GET("/"+plural+"/create", handler.Create)
+	router.POST("/"+plural+"", handler.Store)
+	router.PUT("/"+plural+"/:"+singular+"", handler.Update)
+	router.DELETE("/"+plural+"/:"+singular+"", handler.Delete)
 }
 
 func configDb() (db *gorm.DB, err error) {

@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/fredmessias43/car-hub/src/templates"
-	"github.com/fredmessias43/car-hub/src/utils"
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -14,67 +14,80 @@ type CarModelHandler struct {
 	DB *gorm.DB
 }
 
-func (h *CarModelHandler) Index(c echo.Context) error {
+func (h *CarModelHandler) Index(c *gin.Context) {
 	car_models := []models.CarModel{}
-	h.DB.Find(&car_models)
+	h.DB.Preload("Brand").Find(&car_models)
 
-	return utils.RenderTemplToHTML(c, templates.CarModelsIndexPage("CarModels page", car_models))
+	brands := []models.Brand{}
+	h.DB.Find(&brands)
+
+	c.HTML(http.StatusOK, "", templates.CarModelsIndexPage("CarModels page", car_models, brands))
 }
 
-func (h *CarModelHandler) Show(c echo.Context) error {
+func (h *CarModelHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car_model")))
 
 	car_model := models.CarModel{}
-	_ = h.DB.Find(&car_model, ID)
+	_ = h.DB.Preload("Brand").Find(&car_model, ID)
 
-	return utils.RenderTemplToHTML(c, templates.CarModelIndexCard(car_model))
+	c.HTML(http.StatusOK, "", templates.CarModelIndexCard(car_model))
 }
 
-func (h *CarModelHandler) Edit(c echo.Context) error {
+func (h *CarModelHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car_model")))
 
 	car_model := models.CarModel{}
-	_ = h.DB.Find(&car_model, ID)
+	_ = h.DB.Preload("Brand").Find(&car_model, ID)
 
-	return utils.RenderTemplToHTML(c, templates.CarModelUpsertForm(car_model))
+	brands := []models.Brand{}
+	h.DB.Find(&brands)
+
+	c.HTML(http.StatusOK, "", templates.CarModelUpsertForm(car_model, brands))
 }
 
-func (h *CarModelHandler) Create(c echo.Context) error {
+func (h *CarModelHandler) Create(c *gin.Context) {
 	car_model := models.CarModel{}
-	return utils.RenderTemplToHTML(c, templates.CarModelUpsertForm(car_model))
+
+	brands := []models.Brand{}
+	h.DB.Find(&brands)
+
+	c.HTML(http.StatusOK, "", templates.CarModelUpsertForm(car_model, brands))
 }
 
-func (h *CarModelHandler) Store(c echo.Context) error {
+func (h *CarModelHandler) Store(c *gin.Context) {
 	var car_model models.CarModel
 
 	if err := c.Bind(&car_model); err != nil {
-		return err
+		c.HTML(http.StatusBadRequest, "", err)
+		return
 	}
 
 	_ = h.DB.Create(&car_model)
+	_ = h.DB.Preload("Brand").Find(&car_model)
 
-	return utils.RenderTemplToHTML(c, templates.CarModelIndexCard(car_model))
+	c.HTML(http.StatusOK, "", templates.CarModelIndexCard(car_model))
 }
 
-func (h *CarModelHandler) Update(c echo.Context) error {
+func (h *CarModelHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car_model")))
 
-	car_model := models.CarModel{}
-	_ = h.DB.Find(&car_model, ID)
+	car_model := models.CarModel{ID: ID}
 
 	if err := c.Bind(&car_model); err != nil {
-		return err
+		c.HTML(http.StatusBadRequest, "", err)
+		return
 	}
 
 	h.DB.Model(&car_model).Where("ID = ?", ID).Updates(&car_model)
+	_ = h.DB.Preload("Brand").Find(&car_model, ID)
 
-	return utils.RenderTemplToHTML(c, templates.CarModelIndexCard(car_model))
+	c.HTML(http.StatusOK, "", templates.CarModelIndexCard(car_model))
 }
 
-func (h *CarModelHandler) Delete(c echo.Context) error {
+func (h *CarModelHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("car_model"))
 
 	h.DB.Delete(&models.CarModel{}, ID)
 
-	return nil
+	c.HTML(http.StatusNoContent, "", templates.NoContent())
 }

@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/fredmessias43/car-hub/src/templates"
-	"github.com/fredmessias43/car-hub/src/utils"
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -14,67 +14,69 @@ type ContactHandler struct {
 	DB *gorm.DB
 }
 
-func (h *ContactHandler) Index(c echo.Context) error {
+func (h *ContactHandler) Index(c *gin.Context) {
 	contacts := []models.Contact{}
 	h.DB.Find(&contacts)
 
-	return utils.RenderTemplToHTML(c, templates.ContactsIndexPage("Contacts page", contacts))
+	c.HTML(http.StatusOK, "", templates.ContactsIndexPage("Contacts page", contacts))
 }
 
-func (h *ContactHandler) Show(c echo.Context) error {
+func (h *ContactHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("contact")))
 
 	contact := models.Contact{}
 	_ = h.DB.Find(&contact, ID)
 
-	return utils.RenderTemplToHTML(c, templates.ContactIndexCard(contact))
+	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
 }
 
-func (h *ContactHandler) Edit(c echo.Context) error {
+func (h *ContactHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("contact")))
 
 	contact := models.Contact{}
 	_ = h.DB.Find(&contact, ID)
 
-	return utils.RenderTemplToHTML(c, templates.ContactUpsertForm(contact))
+	c.HTML(http.StatusOK, "", templates.ContactUpsertForm(contact))
 }
 
-func (h *ContactHandler) Create(c echo.Context) error {
+func (h *ContactHandler) Create(c *gin.Context) {
 	contact := models.Contact{}
-	return utils.RenderTemplToHTML(c, templates.ContactUpsertForm(contact))
+	c.HTML(http.StatusOK, "", templates.ContactUpsertForm(contact))
 }
 
-func (h *ContactHandler) Store(c echo.Context) error {
+func (h *ContactHandler) Store(c *gin.Context) {
 	var contact models.Contact
 
 	if err := c.Bind(&contact); err != nil {
-		return err
+		c.HTML(http.StatusBadRequest, "", err)
+		return
 	}
 
 	_ = h.DB.Create(&contact)
 
-	return utils.RenderTemplToHTML(c, templates.ContactIndexCard(contact))
+	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
 }
 
-func (h *ContactHandler) Update(c echo.Context) error {
+func (h *ContactHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("contact")))
 
 	contact := models.Contact{}
 	_ = h.DB.Find(&contact, ID)
 
 	if err := c.Bind(&contact); err != nil {
-		return err
+		c.HTML(http.StatusBadRequest, "", err)
+		return
 	}
 
 	h.DB.Model(&contact).Where("ID = ?", ID).Updates(&contact)
 
-	return utils.RenderTemplToHTML(c, templates.ContactIndexCard(contact))
+	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
 }
 
-func (h *ContactHandler) Delete(c echo.Context) error {
+func (h *ContactHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("contact"))
 
 	h.DB.Delete(&models.Contact{}, ID)
 
-	return nil
+	c.HTML(http.StatusOK, "", templates.NoContent())
 }

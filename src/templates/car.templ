@@ -3,9 +3,9 @@ package templates
 import "github.com/fredmessias43/car-hub/src/models"
 import "fmt"
 
-templ CarsIndexPage(title string, cars []models.Car) {
+templ CarsIndexPage(title string, cars []models.Car, carModelVersions []models.CarModelVersion) {
   @BaseComponent(title) {
-		@CarUpsertForm(models.Car{})
+		@CarUpsertForm(models.Car{}, carModelVersions)
 
     <div id="car-list">
       for _,car := range cars {
@@ -15,7 +15,7 @@ templ CarsIndexPage(title string, cars []models.Car) {
 	}
 }
 
-templ CarUpsertForm(car models.Car) {
+templ CarUpsertForm(car models.Car, carModelVersions []models.CarModelVersion) {
   <form 
     if (car.ID != 0) {
       hx-put={getEndpoint("cars", "update", car.ID)}
@@ -29,8 +29,18 @@ templ CarUpsertForm(car models.Car) {
     }
   >
     <div class="form-control">
-      <label class="label" >ModelVersionID</label>
-      <input class="input input-bordered" type="text" name="ModelVersionID" value={ fmt.Sprintf("%d", car.ModelVersionID) } />
+      <label class="label" >Car Model Version</label>
+      <select class="select select-bordered" name="ModelVersionID">
+        <option disabled selected>Select an Car Model Version</option>
+        for _,carModelVersion := range carModelVersions {
+          <option
+            value={fmt.Sprintf("%d", carModelVersion.ID)}
+            if (carModelVersion.ID == car.ModelVersionID) {
+              selected="selected"
+            }
+          >{carModelVersion.Name}</option>
+        }
+      </select>
     </div>
     <div class="form-control">
       <label class="label" >Color</label>
@@ -62,7 +72,7 @@ templ CarUpsertForm(car models.Car) {
 
 templ CarIndexCard(car models.Car) {
   <div hx-target="this" hx-swap="outerHTML">
-    <div><label>ModelVersionID</label>: { fmt.Sprintf("%d", car.ModelVersionID) }</div>
+    <div><label>Car Model Version</label>: { car.CarModelVersion.Name }</div>
     <div><label>Color</label>: { car.Color }</div>
     <div><label>Mileage</label>: { fmt.Sprintf("%d", car.Mileage) }</div>
     <div><label>Price</label>: { fmt.Sprintf("%f", car.Price) }</div>

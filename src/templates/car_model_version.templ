@@ -3,9 +3,9 @@ package templates
 import "github.com/fredmessias43/car-hub/src/models"
 import "fmt"
 
-templ CarModelVersionsIndexPage(title string, car_model_versions []models.CarModelVersion) {
+templ CarModelVersionsIndexPage(title string, car_model_versions []models.CarModelVersion, carModels []models.CarModel) {
   @BaseComponent(title) {
-		@CarModelVersionUpsertForm(models.CarModelVersion{})
+		@CarModelVersionUpsertForm(models.CarModelVersion{}, carModels)
 
     <div id="car_model_version-list">
       for _,car_model_version := range car_model_versions {
@@ -15,7 +15,7 @@ templ CarModelVersionsIndexPage(title string, car_model_versions []models.CarMod
 	}
 }
 
-templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion) {
+templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion, carModels []models.CarModel) {
   <form 
     if (carModelVersion.ID != 0) {
       hx-put={getEndpoint("car_model_versions", "update", carModelVersion.ID)}
@@ -24,7 +24,7 @@ templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion) {
     }
     else {
       hx-post={getEndpoint("car_model_versions", "store", carModelVersion.ID)}
-      hx-target="#car_model-list" 
+      hx-target="#car_model_version-list" 
       hx-swap="beforeend"
     }
   >
@@ -33,16 +33,26 @@ templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion) {
       <input class="input input-bordered" type="text" name="Name" value={ (carModelVersion.Name) } />
     </div>
     <div class="form-control">
-      <label class="label" >ModelID</label>
-      <input class="input input-bordered" type="text" name="ModelID" value={ fmt.Sprintf("%d", carModelVersion.ModelID) } />
+      <label class="label" >Car Model</label>
+      <select class="select select-bordered" name="ModelID">
+        <option disabled selected>Select an Car Model</option>
+        for _,carModel := range carModels {
+          <option
+            value={fmt.Sprintf("%d", carModel.ID)}
+            if (carModel.ID == carModelVersion.ModelID) {
+              selected="selected"
+            }
+          >{carModel.Name}</option>
+        }
+      </select>
     </div>
     <div class="form-control">
       <label class="label" >Specifications</label>
-      <input class="input input-bordered" type="email" name="Specifications" value={ (carModelVersion.Specifications) } />
+      <input class="input input-bordered" type="text" name="Specifications" value={ (carModelVersion.Specifications) } />
     </div>
     <div class="form-control">
       <label class="label" >Features</label>
-      <input class="input input-bordered" type="email" name="Features" value={ (carModelVersion.Features) } />
+      <input class="input input-bordered" type="text" name="Features" value={ (carModelVersion.Features) } />
     </div>
     <button class="btn mt-3">Save</button>
     if (carModelVersion.ID != 0) {
@@ -55,7 +65,7 @@ templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion) {
 templ CarModelVersionIndexCard(carModelVersion models.CarModelVersion) {
   <div hx-target="this" hx-swap="outerHTML">
     <div><label>Name</label>: { (carModelVersion.Name) }</div>
-    <div><label>ModelID</label>: { fmt.Sprintf("%d", carModelVersion.ModelID) }</div>
+    <div><label>Car Model</label>: { carModelVersion.CarModel.Name }</div>
     <div><label>Specifications</label>: { (carModelVersion.Specifications) }</div>
     <div><label>Features</label>: { (carModelVersion.Features) }</div>
     <button hx-get={getEndpoint("car_model_versions", "edit", carModelVersion.ID)} class="btn btn-primary">Edit</button>

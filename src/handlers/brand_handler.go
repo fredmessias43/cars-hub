@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/fredmessias43/car-hub/src/templates"
-	"github.com/fredmessias43/car-hub/src/utils"
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -14,67 +14,79 @@ type BrandHandler struct {
 	DB *gorm.DB
 }
 
-func (h *BrandHandler) Index(c echo.Context) error {
+func (h *BrandHandler) Index(c *gin.Context) {
 	brands := []models.Brand{}
-	h.DB.Find(&brands)
+	h.DB.Preload("Manufacturer").Find(&brands)
 
-	return utils.RenderTemplToHTML(c, templates.BrandsIndexPage("Brands page", brands))
+	manufacturers := []models.Manufacturer{}
+	h.DB.Find(&manufacturers)
+
+	c.HTML(http.StatusOK, "", templates.BrandsIndexPage("Brands page", brands, manufacturers))
 }
 
-func (h *BrandHandler) Show(c echo.Context) error {
+func (h *BrandHandler) Show(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param(("brand")))
+
+	brand := models.Brand{ID: ID}
+	_ = h.DB.Preload("Manufacturer").Find(&brand)
+
+	c.HTML(http.StatusOK, "", templates.BrandIndexCard(brand))
+}
+
+func (h *BrandHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("brand")))
 
 	brand := models.Brand{}
-	_ = h.DB.Find(&brand, ID)
+	_ = h.DB.Preload("Manufacturer").Find(&brand, ID)
 
-	return utils.RenderTemplToHTML(c, templates.BrandIndexCard(brand))
+	manufacturers := []models.Manufacturer{}
+	h.DB.Find(&manufacturers)
+
+	c.HTML(http.StatusOK, "", templates.BrandUpsertForm(brand, manufacturers))
 }
 
-func (h *BrandHandler) Edit(c echo.Context) error {
-	ID, _ := strconv.Atoi(c.Param(("brand")))
-
+func (h *BrandHandler) Create(c *gin.Context) {
 	brand := models.Brand{}
-	_ = h.DB.Find(&brand, ID)
 
-	return utils.RenderTemplToHTML(c, templates.BrandUpsertForm(brand))
+	manufacturers := []models.Manufacturer{}
+	h.DB.Find(&manufacturers)
+
+	c.HTML(http.StatusOK, "", templates.BrandUpsertForm(brand, manufacturers))
 }
 
-func (h *BrandHandler) Create(c echo.Context) error {
+func (h *BrandHandler) Store(c *gin.Context) {
 	brand := models.Brand{}
-	return utils.RenderTemplToHTML(c, templates.BrandUpsertForm(brand))
-}
-
-func (h *BrandHandler) Store(c echo.Context) error {
-	var brand models.Brand
 
 	if err := c.Bind(&brand); err != nil {
-		return err
+		c.HTML(http.StatusBadRequest, "", err)
+		return
 	}
 
 	_ = h.DB.Create(&brand)
+	_ = h.DB.Preload("Manufacturer").Find(&brand)
 
-	return utils.RenderTemplToHTML(c, templates.BrandIndexCard(brand))
+	c.HTML(http.StatusOK, "", templates.BrandIndexCard(brand))
 }
 
-func (h *BrandHandler) Update(c echo.Context) error {
+func (h *BrandHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("brand")))
 
-	brand := models.Brand{}
-	_ = h.DB.Find(&brand, ID)
-
-	if err := c.Bind(&brand); err != nil {
-		return err
+	brand := models.Brand{ID: ID}
+	if err := c.ShouldBind(&brand); err != nil {
+		c.HTML(http.StatusBadRequest, "", err)
+		return
 	}
 
 	h.DB.Model(&brand).Where("ID = ?", ID).Updates(&brand)
+	_ = h.DB.Preload("Manufacturer").Find(&brand, ID)
 
-	return utils.RenderTemplToHTML(c, templates.BrandIndexCard(brand))
+	c.HTML(http.StatusOK, "", templates.BrandIndexCard(brand))
 }
 
-func (h *BrandHandler) Delete(c echo.Context) error {
+func (h *BrandHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("brand"))
 
-	h.DB.Delete(&models.Brand{}, ID)
+	h.DB.Delete(&models.Brand{ID: ID}, ID)
 
-	return nil
+	c.HTML(http.StatusOK, "", templates.NoContent())
 }

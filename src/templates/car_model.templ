@@ -3,9 +3,9 @@ package templates
 import "github.com/fredmessias43/car-hub/src/models"
 import "fmt"
 
-templ CarModelsIndexPage(title string, car_models []models.CarModel) {
+templ CarModelsIndexPage(title string, car_models []models.CarModel, brands []models.Brand) {
   @BaseComponent(title) {
-		@CarModelUpsertForm(models.CarModel{})
+		@CarModelUpsertForm(models.CarModel{}, brands)
 
     <div id="car_model-list">
       for _,car_model := range car_models {
@@ -15,7 +15,7 @@ templ CarModelsIndexPage(title string, car_models []models.CarModel) {
 	}
 }
 
-templ CarModelUpsertForm(carModel models.CarModel) {
+templ CarModelUpsertForm(carModel models.CarModel, brands []models.Brand) {
   <form 
     if (carModel.ID != 0) {
       hx-put={getEndpoint("car_models", "update", carModel.ID)}
@@ -29,16 +29,26 @@ templ CarModelUpsertForm(carModel models.CarModel) {
     }
   >
     <div class="form-control">
-      <label class="label" >First Name</label>
-      <input class="input input-bordered" type="text" name="BrandID" value={ fmt.Sprintf("%d", carModel.BrandID) } />
+      <label class="label" >Brand</label>
+      <select class="select select-bordered" name="BrandID">
+        <option disabled selected>Select an Brand</option>
+        for _,brand := range brands {
+          <option
+            value={fmt.Sprintf("%d", brand.ID)}
+            if (brand.ID == carModel.BrandID) {
+              selected="selected"
+            }
+          >{brand.Name}</option>
+        }
+      </select>
     </div>
     <div class="form-control">
-      <label class="label" >Last Name</label>
+      <label class="label" >Name</label>
       <input class="input input-bordered" type="text" name="Name" value={ carModel.Name } />
     </div>
     <div class="form-control">
-      <label class="label" >Email</label>
-      <input class="input input-bordered" type="email" name="ManufactureYear" value={ fmt.Sprintf("%d", carModel.ManufactureYear) } />
+      <label class="label" >Manufacturer Year</label>
+      <input class="input input-bordered" type="number" name="ManufactureYear" value={ fmt.Sprintf("%d", carModel.ManufactureYear) } />
     </div>
     <button class="btn mt-3">Save</button>
     if (carModel.ID != 0) {
@@ -50,9 +60,9 @@ templ CarModelUpsertForm(carModel models.CarModel) {
 
 templ CarModelIndexCard(carModel models.CarModel) {
   <div hx-target="this" hx-swap="outerHTML">
-    <div><label>BrandID</label>: { fmt.Sprintf("%d", carModel.BrandID) }</div>
+    <div><label>Brand</label>: { carModel.Brand.Name }</div>
     <div><label>Name</label>: { carModel.Name }</div>
-    <div><label>ManufactureYear</label>: { fmt.Sprintf("%d", carModel.ManufactureYear) }</div>
+    <div><label>Manufacture Year</label>: { fmt.Sprintf("%d", carModel.ManufactureYear) }</div>
     <button hx-get={getEndpoint("car_models", "edit", carModel.ID)} class="btn btn-primary">Edit</button>
     <button class="btn btn-error" hx-delete={getEndpoint("car_models", "delete", carModel.ID)}>Delete</button>
     <span class="htmx-indicator">Loading...</span>

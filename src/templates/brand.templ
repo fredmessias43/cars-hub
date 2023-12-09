@@ -3,9 +3,9 @@ package templates
 import "github.com/fredmessias43/car-hub/src/models"
 import "fmt"
 
-templ BrandsIndexPage(title string, brands []models.Brand) {
+templ BrandsIndexPage(title string, brands []models.Brand, manufacturers []models.Manufacturer) {
   @BaseComponent(title) {
-		@BrandUpsertForm(models.Brand{})
+		@BrandUpsertForm(models.Brand{}, manufacturers)
 
     <div id="brand-list">
       for _,brand := range brands {
@@ -15,7 +15,7 @@ templ BrandsIndexPage(title string, brands []models.Brand) {
 	}
 }
 
-templ BrandUpsertForm(brand models.Brand) {
+templ BrandUpsertForm(brand models.Brand, manufacturers []models.Manufacturer) {
   <form 
     if (brand.ID != 0) {
       hx-put={getEndpoint("brands", "update", brand.ID)}
@@ -34,7 +34,17 @@ templ BrandUpsertForm(brand models.Brand) {
     </div>
     <div class="form-control">
       <label class="label" >Manufacturer</label>
-      <input class="input input-bordered" type="text" name="ManufacturerID" value={ fmt.Sprintf("%d", brand.ManufacturerID) } />
+      <select class="select select-bordered" name="ManufacturerID">
+        <option disabled selected>Select an Manufacturer</option>
+        for _,manufacturer := range manufacturers {
+          <option
+            value={fmt.Sprintf("%d", manufacturer.ID)}
+            if (manufacturer.ID == brand.ManufacturerID) {
+              selected="selected"
+            }
+          >{manufacturer.Name}</option>
+        }
+      </select>
     </div>
     <button class="btn mt-3">Save</button>
     if (brand.ID != 0) {
@@ -47,7 +57,7 @@ templ BrandUpsertForm(brand models.Brand) {
 templ BrandIndexCard(brand models.Brand) {
   <div hx-target="this" hx-swap="outerHTML">
     <div><label>Name</label>: { brand.Name }</div>
-    <div><label>Manufacturer</label>: { fmt.Sprintf("%d", brand.ManufacturerID) }</div>
+    <div><label>Manufacturer</label>: { brand.Manufacturer.Name }</div>
     <button hx-get={getEndpoint("brands", "edit", brand.ID)} class="btn btn-primary">Edit</button>
     <button class="btn btn-error" hx-delete={getEndpoint("brands", "delete", brand.ID)}>Delete</button>
     <span class="htmx-indicator">Loading...</span>

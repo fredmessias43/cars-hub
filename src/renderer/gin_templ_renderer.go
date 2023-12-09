@@ -1,4 +1,4 @@
-package main
+package renderer
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin/render"
 )
 
-type GinTemplRender struct {
+type TemplRender struct {
 	Code int
 	Data templ.Component
 }
 
-func (t GinTemplRender) Render(w http.ResponseWriter) error {
+func (t TemplRender) Render(w http.ResponseWriter) error {
 	t.WriteContentType(w)
 	w.WriteHeader(t.Code)
 	if t.Data != nil {
@@ -22,13 +22,13 @@ func (t GinTemplRender) Render(w http.ResponseWriter) error {
 	return nil
 }
 
-func (t GinTemplRender) WriteContentType(w http.ResponseWriter) {
+func (t TemplRender) WriteContentType(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 }
 
-func (t *GinTemplRender) Instance(name string, data interface{}) render.Render {
+func (t *TemplRender) Instance(name string, data interface{}) render.Render {
 	if templData, ok := data.(templ.Component); ok {
-		return &GinTemplRender{
+		return &TemplRender{
 			Code: http.StatusOK,
 			Data: templData,
 		}

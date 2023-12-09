@@ -8,7 +8,7 @@ type CarModel struct {
 	BrandID         int    `json:"brand_id"`
 	Name            string `json:"name"`
 	ManufactureYear int    `json:"manufacture_year"`
-	Brand           Brand
+	Brand           Brand  `form:"-"`
 }
 
 func (m *CarModel) ToMap() map[string]any {
