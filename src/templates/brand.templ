@@ -16,6 +16,13 @@ templ BrandsIndexPage(title string, brands []models.Brand, manufacturers []model
 }
 
 templ BrandUpsertForm(brand models.Brand, manufacturers []models.Manufacturer) {
+  <div hx-ext="ws" ws-connect="/ws?name=manufacturer-form-control">
+    <form hx-trigger="load" ws-send>
+      <input type="hidden" name="action" value="join-room" />
+      <input type="hidden" name="message" value="manufacturer-created" />
+    </form>
+  </div>
+
   <form 
     if (brand.ID != 0) {
       hx-put={getEndpoint("brands", "update", brand.ID)}

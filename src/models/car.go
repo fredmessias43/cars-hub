@@ -1,6 +1,11 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+
+	"github.com/fredmessias43/car-hub/src/config"
+	"gorm.io/gorm"
+)
 
 type Car struct {
 	gorm.Model
@@ -24,4 +29,15 @@ func (m *Car) ToMap() map[string]any {
 		"FuelType":       m.FuelType,
 		"Transmission":   m.Transmission,
 	}
+}
+
+func (m *Car) ToJson() []byte {
+	bytes, _ := json.Marshal(m.ToMap())
+	return bytes
+}
+
+func (m *Car) AfterCreate(tx *gorm.DB) error {
+	room := config.WS.FindRoomByName("")
+	room.BroadcastToClientsInRoom(m.ToJson())
+	return nil
 }

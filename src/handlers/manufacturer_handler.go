@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/fredmessias43/car-hub/src/config"
 	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/fredmessias43/car-hub/src/templates"
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ type ManufacturerHandler struct {
 
 func (h *ManufacturerHandler) Index(c *gin.Context) {
 	manufacturers := []models.Manufacturer{}
-	h.DB.Find(&manufacturers)
+	config.DB.Find(&manufacturers)
 
 	c.HTML(http.StatusOK, "", templates.ManufacturersIndexPage("Manufacturers page", manufacturers))
 }
@@ -25,7 +26,7 @@ func (h *ManufacturerHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("manufacturer")))
 
 	manufacturer := models.Manufacturer{}
-	_ = h.DB.Find(&manufacturer, ID)
+	_ = config.DB.Find(&manufacturer, ID)
 
 	c.HTML(http.StatusOK, "", templates.ManufacturerIndexCard(manufacturer))
 }
@@ -34,7 +35,7 @@ func (h *ManufacturerHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("manufacturer")))
 
 	manufacturer := models.Manufacturer{}
-	_ = h.DB.Find(&manufacturer, ID)
+	_ = config.DB.Find(&manufacturer, ID)
 
 	c.HTML(http.StatusOK, "", templates.ManufacturerUpsertForm(manufacturer))
 }
@@ -52,7 +53,7 @@ func (h *ManufacturerHandler) Store(c *gin.Context) {
 		return
 	}
 
-	_ = h.DB.Create(&manufacturer)
+	_ = config.DB.Create(&manufacturer)
 
 	c.HTML(http.StatusOK, "", templates.ManufacturerIndexCard(manufacturer))
 }
@@ -61,14 +62,14 @@ func (h *ManufacturerHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("manufacturer")))
 
 	manufacturer := models.Manufacturer{}
-	_ = h.DB.Find(&manufacturer, ID)
+	_ = config.DB.Find(&manufacturer, ID)
 
 	if err := c.Bind(&manufacturer); err != nil {
 		c.HTML(http.StatusBadRequest, "", err)
 		return
 	}
 
-	h.DB.Model(&manufacturer).Where("ID = ?", ID).Updates(&manufacturer)
+	config.DB.Model(&manufacturer).Where("ID = ?", ID).Updates(&manufacturer)
 
 	c.HTML(http.StatusOK, "", templates.ManufacturerIndexCard(manufacturer))
 }
@@ -76,7 +77,7 @@ func (h *ManufacturerHandler) Update(c *gin.Context) {
 func (h *ManufacturerHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("manufacturer"))
 
-	h.DB.Delete(&models.Manufacturer{}, ID)
+	config.DB.Delete(&models.Manufacturer{}, ID)
 
 	c.HTML(http.StatusOK, "", templates.NoContent())
 }

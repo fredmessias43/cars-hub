@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/fredmessias43/car-hub/src/config"
 	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/fredmessias43/car-hub/src/templates"
 	"github.com/gin-gonic/gin"
@@ -16,10 +17,10 @@ type CarModelVersionHandler struct {
 
 func (h *CarModelVersionHandler) Index(c *gin.Context) {
 	carModelVersions := []models.CarModelVersion{}
-	h.DB.Preload("CarModel").Find(&carModelVersions)
+	config.DB.Preload("CarModel").Find(&carModelVersions)
 
 	carModels := []models.CarModel{}
-	_ = h.DB.Find(&carModels)
+	_ = config.DB.Find(&carModels)
 
 	c.HTML(http.StatusOK, "", templates.CarModelVersionsIndexPage("CarModelVersions page", carModelVersions, carModels))
 }
@@ -28,7 +29,7 @@ func (h *CarModelVersionHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("carModelVersion")))
 
 	carModelVersion := models.CarModelVersion{ID: ID}
-	_ = h.DB.Preload("CarModel").Find(&carModelVersion)
+	_ = config.DB.Preload("CarModel").Find(&carModelVersion)
 
 	c.HTML(http.StatusOK, "", templates.CarModelVersionIndexCard(carModelVersion))
 }
@@ -37,10 +38,10 @@ func (h *CarModelVersionHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("carModelVersion")))
 
 	carModelVersion := models.CarModelVersion{ID: ID}
-	_ = h.DB.Preload("CarModel").Find(&carModelVersion)
+	_ = config.DB.Preload("CarModel").Find(&carModelVersion)
 
 	carModels := []models.CarModel{}
-	_ = h.DB.Find(&carModels)
+	_ = config.DB.Find(&carModels)
 
 	c.HTML(http.StatusOK, "", templates.CarModelVersionUpsertForm(carModelVersion, carModels))
 }
@@ -49,7 +50,7 @@ func (h *CarModelVersionHandler) Create(c *gin.Context) {
 	carModelVersion := models.CarModelVersion{}
 
 	carModels := []models.CarModel{}
-	_ = h.DB.Find(&carModels)
+	_ = config.DB.Find(&carModels)
 
 	c.HTML(http.StatusOK, "", templates.CarModelVersionUpsertForm(carModelVersion, carModels))
 }
@@ -62,8 +63,8 @@ func (h *CarModelVersionHandler) Store(c *gin.Context) {
 		return
 	}
 
-	_ = h.DB.Create(&carModelVersion)
-	_ = h.DB.Preload("CarModel").Find(&carModelVersion)
+	_ = config.DB.Create(&carModelVersion)
+	_ = config.DB.Preload("CarModel").Find(&carModelVersion)
 
 	c.HTML(http.StatusOK, "", templates.CarModelVersionIndexCard(carModelVersion))
 }
@@ -78,8 +79,8 @@ func (h *CarModelVersionHandler) Update(c *gin.Context) {
 		return
 	}
 
-	h.DB.Model(&carModelVersion).Where("ID = ?", ID).Updates(&carModelVersion)
-	_ = h.DB.Preload("CarModel").Find(&carModelVersion)
+	config.DB.Model(&carModelVersion).Where("ID = ?", ID).Updates(&carModelVersion)
+	_ = config.DB.Preload("CarModel").Find(&carModelVersion)
 
 	c.HTML(http.StatusOK, "", templates.CarModelVersionIndexCard(carModelVersion))
 }
@@ -87,7 +88,7 @@ func (h *CarModelVersionHandler) Update(c *gin.Context) {
 func (h *CarModelVersionHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("carModelVersion"))
 
-	h.DB.Delete(&models.CarModelVersion{ID: ID})
+	config.DB.Delete(&models.CarModelVersion{ID: ID})
 
 	c.HTML(http.StatusNoContent, "", templates.NoContent())
 }

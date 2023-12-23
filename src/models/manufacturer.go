@@ -1,6 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+	"log"
+	"strconv"
+
+	"github.com/fredmessias43/car-hub/src/config"
+	"gorm.io/gorm"
+)
 
 type Manufacturer struct {
 	gorm.Model
@@ -15,4 +22,16 @@ func (m *Manufacturer) ToMap() map[string]any {
 		"Name":          m.Name,
 		"CountryOrigin": m.CountryOrigin,
 	}
+}
+
+func (m *Manufacturer) ToJson() []byte {
+	bytes, _ := json.Marshal(m.ToMap())
+	return bytes
+}
+
+func (m *Manufacturer) AfterSave(tx *gorm.DB) error {
+	room := config.WS.FindRoomByName("manufacturer-created")
+	log.Println(strconv.Itoa(m.ID) + " => " + room.Name)
+	room.BroadcastToClientsInRoom(m.ToJson())
+	return nil
 }

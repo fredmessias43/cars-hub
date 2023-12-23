@@ -1,56 +1,59 @@
 package main
 
 import (
-	"io"
-	"log"
 	"net/http"
-	"os"
-	"time"
 
+	"github.com/fredmessias43/car-hub/src/config"
 	"github.com/fredmessias43/car-hub/src/contracts"
+	"github.com/fredmessias43/car-hub/src/database"
 	"github.com/fredmessias43/car-hub/src/handlers"
-	"github.com/fredmessias43/car-hub/src/models"
 	"github.com/fredmessias43/car-hub/src/renderer"
+	"github.com/fredmessias43/car-hub/src/websocket"
 	"github.com/gertd/go-pluralize"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func main() {
-	db, err := configDb()
+	var err error
+	config.DB, err = database.NewDatabaseClient()
 	if err != nil {
 		panic("failed to connect database: " + err.Error())
 	}
 
-	router := gin.Default()
-	router.HTMLRender = &renderer.TemplRender{}
-	router.Static("/assets", "./src/public/assets")
+	config.Router = gin.Default()
+	config.Router.HTMLRender = &renderer.TemplRender{}
+	config.Router.Static("/assets", "./src/public/assets")
 
-	router.GET("/", func(c *gin.Context) {
+	config.Router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/cars")
 	})
 
-	contactHandler := handlers.ContactHandler{DB: db}
-	routerResource(router, "contact", &contactHandler)
+	config.WS = websocket.NewWebsocketServer()
+	go config.WS.Run()
 
-	manufacturerHandler := handlers.ManufacturerHandler{DB: db}
-	routerResource(router, "manufacturer", &manufacturerHandler)
+	config.Router.GET("/ws", func(c *gin.Context) {
+		websocket.ServeWs(config.WS, c.Writer, c.Request)
+	})
 
-	brandHandler := handlers.BrandHandler{DB: db}
-	routerResource(router, "brand", &brandHandler)
+	contactHandler := handlers.ContactHandler{}
+	routerResource(config.Router, "contact", &contactHandler)
 
-	carModelHandler := handlers.CarModelHandler{DB: db}
-	routerResource(router, "car_model", &carModelHandler)
+	manufacturerHandler := handlers.ManufacturerHandler{}
+	routerResource(config.Router, "manufacturer", &manufacturerHandler)
 
-	carModelVersionHandler := handlers.CarModelVersionHandler{DB: db}
-	routerResource(router, "car_model_version", &carModelVersionHandler)
+	brandHandler := handlers.BrandHandler{}
+	routerResource(config.Router, "brand", &brandHandler)
 
-	carHandler := handlers.CarHandler{DB: db}
-	routerResource(router, "car", &carHandler)
+	carModelHandler := handlers.CarModelHandler{}
+	routerResource(config.Router, "car_model", &carModelHandler)
 
-	router.Run()
+	carModelVersionHandler := handlers.CarModelVersionHandler{}
+	routerResource(config.Router, "car_model_version", &carModelVersionHandler)
+
+	carHandler := handlers.CarHandler{}
+	routerResource(config.Router, "car", &carHandler)
+
+	config.Router.Run()
 }
 
 func routerResource(router *gin.Engine, key string, handler contracts.Handler) {
@@ -64,35 +67,4 @@ func routerResource(router *gin.Engine, key string, handler contracts.Handler) {
 	router.POST("/"+plural+"", handler.Store)
 	router.PUT("/"+plural+"/:"+singular+"", handler.Update)
 	router.DELETE("/"+plural+"/:"+singular+"", handler.Delete)
-}
-
-func configDb() (db *gorm.DB, err error) {
-	dbLog, _ := os.Create("./src/logs/db.log")
-	out := io.MultiWriter(dbLog)
-	newLogger := logger.New(
-		log.New(out, "\n", log.LstdFlags), // io writer
-		logger.Config{
-			SlowThreshold:             time.Second,   // Slow SQL threshold
-			LogLevel:                  logger.Silent, // Log level
-			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,         // Disable color
-		},
-	)
-
-	db, err = gorm.Open(sqlite.Open("./src/database/db.sqlite"), &gorm.Config{
-		Logger: newLogger,
-	})
-	if err != nil {
-		return nil, err
-	}
-	db.AutoMigrate(
-		&models.Contact{},
-		&models.Manufacturer{},
-		&models.Brand{},
-		&models.CarModel{},
-		&models.CarModelVersion{},
-		&models.Car{},
-	)
-
-	return db, nil
 }

@@ -1,6 +1,11 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+
+	"github.com/fredmessias43/car-hub/src/config"
+	"gorm.io/gorm"
+)
 
 type Contact struct {
 	gorm.Model
@@ -17,4 +22,15 @@ func (m *Contact) ToMap() map[string]any {
 		"LastName":  m.LastName,
 		"Email":     m.Email,
 	}
+}
+
+func (m *Contact) ToJson() []byte {
+	bytes, _ := json.Marshal(m.ToMap())
+	return bytes
+}
+
+func (m *Contact) AfterCreate(tx *gorm.DB) error {
+	room := config.WS.FindRoomByName("")
+	room.BroadcastToClientsInRoom(m.ToJson())
+	return nil
 }

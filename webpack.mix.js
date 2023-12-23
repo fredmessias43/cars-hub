@@ -8,3 +8,4 @@ mix.setPublicPath("./src/public");
 
 mix.js(`${res_base_path}/js/index.js`, `${dist_base_path}/js/`);
 mix.postCss(`${res_base_path}/css/index.css`, `${dist_base_path}/css/`);
+mix.copy(`${res_base_path}/images`, `${dist_base_path}/images/`);
