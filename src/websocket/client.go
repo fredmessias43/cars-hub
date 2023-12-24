@@ -257,7 +257,7 @@ func (client *Client) notifyRoomJoined(room *Room, sender *Client) {
 		Sender: sender,
 	}
 
-	client.send <- message.encode()
+	client.send <- message.Encode()
 }
 
 func (client *Client) GetName() string {

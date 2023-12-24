@@ -56,7 +56,7 @@ func (server *WsServer) NotifyClientJoined(client *Client) {
 		Sender: client,
 	}
 
-	server.BroadcastToClients(message.encode())
+	server.BroadcastToClients(message.Encode())
 }
 
 func (server *WsServer) NotifyClientLeft(client *Client) {
@@ -65,7 +65,7 @@ func (server *WsServer) NotifyClientLeft(client *Client) {
 		Sender: client,
 	}
 
-	server.BroadcastToClients(message.encode())
+	server.BroadcastToClients(message.Encode())
 }
 
 func (server *WsServer) ListOnlineClients(client *Client) {
@@ -74,7 +74,7 @@ func (server *WsServer) ListOnlineClients(client *Client) {
 			Action: UserJoinedAction,
 			Sender: existingClient,
 		}
-		client.send <- message.encode()
+		client.send <- message.Encode()
 	}
 
 }

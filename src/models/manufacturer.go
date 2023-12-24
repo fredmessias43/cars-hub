@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/fredmessias43/car-hub/src/config"
+	"github.com/fredmessias43/car-hub/src/websocket"
 	"gorm.io/gorm"
 )
 
@@ -32,6 +33,13 @@ func (m *Manufacturer) ToJson() []byte {
 func (m *Manufacturer) AfterSave(tx *gorm.DB) error {
 	room := config.WS.FindRoomByName("manufacturer-created")
 	log.Println(strconv.Itoa(m.ID) + " => " + room.Name)
-	room.BroadcastToClientsInRoom(m.ToJson())
+
+	message := websocket.Message{
+		Action:  websocket.SendMessageAction,
+		Message: string(m.ToJson()),
+		Target:  room,
+	}
+
+	room.BroadcastToClientsInRoom(message.Encode())
 	return nil
 }

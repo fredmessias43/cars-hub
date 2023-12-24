@@ -43,7 +43,7 @@ func (room *Room) RunRoom() {
 			room.UnregisterClientInRoom(client)
 
 		case message := <-room.broadcast:
-			room.BroadcastToClientsInRoom(message.encode())
+			room.BroadcastToClientsInRoom(message.Encode())
 		}
 
 	}
@@ -75,7 +75,7 @@ func (room *Room) NotifyClientJoined(client *Client) {
 		Message: fmt.Sprintf(welcomeMessage, client.GetName()),
 	}
 
-	room.BroadcastToClientsInRoom(message.encode())
+	room.BroadcastToClientsInRoom(message.Encode())
 }
 
 func (room *Room) GetId() string {

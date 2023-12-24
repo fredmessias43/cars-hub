@@ -53,6 +53,11 @@ func main() {
 	carHandler := handlers.CarHandler{}
 	routerResource(config.Router, "car", &carHandler)
 
+	// Components
+
+	manufacturerComponentHandler := handlers.ManufacturerComponentHandler{}
+	config.Router.GET("/manufacturers/:manufacturer/components/option", manufacturerComponentHandler.ShowOptionComponent)
+
 	config.Router.Run()
 }
 

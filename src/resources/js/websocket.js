@@ -1,25 +1,26 @@
 class WebSocketClient {
-  constructor(name) {
+  constructor(name, roomName, msgCbFunc = (message) => {}) {
     this.ws = null;
     this.serverUrl = "ws://localhost:8080/ws?name=" + name;
-    this.roomInput = null;
+    this.messages = null;
+    this.onReceiveMessage = msgCbFunc;
+    this.users = [];
+
+    this._connectToWebsocket();
+    this.joinRoom(roomName);
   }
 
-  connect() {
-    this.connectToWebsocket();
-  }
-
-  connectToWebsocket() {
+  _connectToWebsocket() {
     this.ws = new WebSocket(this.serverUrl);
-    this.ws.addEventListener('open', (event) => { this.onWebsocketOpen(event) });
-    this.ws.addEventListener('message', (event) => { this.handleNewMessage(event) });
+    this.ws.addEventListener('open', (event) => { this._onWebsocketOpen(event) });
+    this.ws.addEventListener('message', (event) => { this._handleNewMessage(event) });
   }
 
-  onWebsocketOpen() {
+  _onWebsocketOpen() {
     console.log("connected to WS!");
   }
 
-  handleNewMessage(event) {
+  _handleNewMessage(event) {
     let data = event.data;
     data = data.split(/\r?\n/);
   
@@ -27,16 +28,16 @@ class WebSocketClient {
       let msg = JSON.parse(element);
       switch (msg.action) {
         case "send-message":
-          this.handleChatMessage(msg);
+          this._handleSendMessage(msg.message);
           break;
         case "user-join":
-          this.handleUserJoined(msg);
+          this._handleUserJoined(msg);
           break;
         case "user-left":
-          this.handleUserLeft(msg);
+          this._handleUserLeft(msg);
           break;
         case "room-joined":
-          this.handleRoomJoined(msg);
+          this._handleRoomJoined(msg);
           break;
         default:
           break;
@@ -45,18 +46,16 @@ class WebSocketClient {
     }
   }
 
-  handleChatMessage(msg) {
-    const room = this.findRoom(msg.target.id);
-    if (typeof room !== "undefined") {
-      room.messages.push(msg);
-    }
+  _handleSendMessage(msg) {
+    this.messages.push(msg);
+    this.onReceiveMessage(msg);
   }
 
-  handleUserJoined(msg) {
+  _handleUserJoined(msg) {
     this.users.push(msg.sender);
   }
 
-  handleUserLeft(msg) {
+  _handleUserLeft(msg) {
     for (let i = 0; i < this.users.length; i++) {
       if (this.users[i].id == msg.sender.id) {
         this.users.splice(i, 1);
@@ -64,52 +63,36 @@ class WebSocketClient {
     }
   }
 
-  handleRoomJoined(msg) {
-    let room = msg.target;
-    room.name = room.private ? msg.sender.name : room.name;
-    room["messages"] = [];
-    this.rooms.push(room);
+  _handleRoomJoined(message) {
+    this.room = message.target;
+    this.room.name = this.room.private ? message.sender.name : this.room.name;
+    this.room["messages"] = [];
   }
 
-  sendMessage(room) {
-    if (room.newMessage !== "") {
-      this.ws.send(JSON.stringify({
-        action: 'send-message',
-        message: room.newMessage,
-        target: {
-          id: room.id,
-          name: room.name
-        }
-      }));
-      room.newMessage = "";
-    }
-  }
+  /**
+   * PUBLIC
+   */
 
-  findRoom(roomId) {
-    for (const element of this.rooms) {
-      if (element.id === roomId) {
-        return element
+  sendMessage(message) {
+    this.ws.send(JSON.stringify({
+      action: 'send-message',
+      message: message,
+      target: {
+        id: room.id,
+        name: room.name
       }
-    }
+    }));
   }
 
-  joinRoom() {
-    this.ws.send(JSON.stringify({ action: 'join-room', message: this.roomInput }));
-    this.roomInput = "";
+  joinRoom(roomName) {
+    this.ws.send(JSON.stringify({ action: 'join-room', message: roomName }));
   }
 
-  leaveRoom(room) {
-    this.ws.send(JSON.stringify({ action: 'leave-room', message: room.id }));
-  
-    for (let i = 0; i < this.rooms.length; i++) {
-      if (this.rooms[i].id === room.id) {
-        this.rooms.splice(i, 1);
-        break;
-      }
-    }
+  leaveRoom() {
+    this.ws.send(JSON.stringify({ action: 'leave-room', message: this.room.id }));
   }
 
-  joinPrivateRoom(room) {
-    this.ws.send(JSON.stringify({ action: 'join-room-private', message: room.id }));
+  joinPrivateRoom() {
+    this.ws.send(JSON.stringify({ action: 'join-room-private', message: this.room.id }));
   }
 }

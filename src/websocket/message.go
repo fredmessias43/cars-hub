@@ -20,7 +20,7 @@ type Message struct {
 	Sender  *Client `json:"sender"`
 }
 
-func (message *Message) encode() []byte {
+func (message *Message) Encode() []byte {
 	json, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)

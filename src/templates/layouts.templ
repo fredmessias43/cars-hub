@@ -96,3 +96,21 @@ templ NoContent() {
   <template>
   </template>
 }
+
+templ WebsocketHtmx() {
+  <div hx-ext="ws" ws-connect="/ws?name=manufacturer-form-control">
+    <form hx-trigger="load" ws-send>
+      <input type="hidden" name="action" value="join-room" />
+      <input type="hidden" name="message" value="manufacturer-created" />
+    </form>
+  </div>
+}
+
+templ SelectOption(label string, value string, selected bool) {
+  <option
+    value={value}
+    if (selected) {
+      selected="selected"
+    }
+  >{label}</option>
+}
