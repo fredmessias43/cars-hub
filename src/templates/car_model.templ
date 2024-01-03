@@ -28,34 +28,26 @@ templ CarModelUpsertForm(carModel models.CarModel, brands []models.Brand) {
       hx-swap="beforeend"
     }
   >
-    <div class="form-control">
-      <label class="label" >Brand</label>
-      <select class="select select-bordered" name="BrandID">
-        <option disabled selected>Select an Brand</option>
-        for _,brand := range brands {
-          <option
-            value={fmt.Sprintf("%d", brand.ID)}
-            if (brand.ID == carModel.BrandID) {
-              selected="selected"
-            }
-          >{brand.Name}</option>
-        }
-      </select>
-    </div>
-    <div class="form-control">
-      <label class="label" >Name</label>
-      <input class="input input-bordered" type="text" name="Name" value={ carModel.Name } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Manufacturer Year</label>
-      <input class="input input-bordered" type="number" name="ManufactureYear" value={ fmt.Sprintf("%d", carModel.ManufactureYear) } />
-    </div>
+    @SelectComponent("Brand", "BrandID", listToMap[models.Brand](brands))
+    @CarModelForm("")
+
     <button class="btn mt-3">Save</button>
     if (carModel.ID != 0) {
     <button class="btn" hx-get={getEndpoint("car_models", "show", carModel.ID)}>Cancel</button>
     }
     <span class="htmx-indicator">Loading...</span>
   </form>
+}
+
+templ CarModelForm(prefix string) {
+  <div class="form-control">
+    <label class="label" >Name</label>
+    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >Manufacturer Year</label>
+    <input class="input input-bordered" type="number" name={prefix + "ManufactureYear"} />
+  </div>
 }
 
 templ CarModelIndexCard(carModel models.CarModel) {

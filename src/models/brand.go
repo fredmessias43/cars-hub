@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 
-	"github.com/fredmessias43/car-hub/src/config"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +14,19 @@ type Brand struct {
 	Manufacturer   Manufacturer `form:"-"`
 }
 
-func (m *Brand) ToMap() map[string]any {
+func (m Brand) GetID() int {
+	return m.ID
+}
+
+func (m Brand) GetName() string {
+	return m.Name
+}
+
+func (m Brand) GetRelationshipValue() int {
+	return m.ManufacturerID
+}
+
+func (m Brand) ToMap() map[string]any {
 	return map[string]any{
 		"ID":             m.ID,
 		"Name":           m.Name,
@@ -23,13 +34,11 @@ func (m *Brand) ToMap() map[string]any {
 	}
 }
 
-func (m *Brand) ToJson() []byte {
+func (m Brand) ToJson() []byte {
 	bytes, _ := json.Marshal(m.ToMap())
 	return bytes
 }
 
-func (m *Brand) AfterCreate(tx *gorm.DB) error {
-	room := config.WS.FindRoomByName("")
-	room.BroadcastToClientsInRoom(m.ToJson())
-	return nil
-}
+// func (m Brand) AfterSave(tx *gorm.DB) error {
+// return websocket.Emit("brand-created", m)
+// }

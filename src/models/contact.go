@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 
-	"github.com/fredmessias43/car-hub/src/config"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +14,19 @@ type Contact struct {
 	Email     string `json:"email"`
 }
 
-func (m *Contact) ToMap() map[string]any {
+func (m Contact) GetID() int {
+	return m.ID
+}
+
+func (m Contact) GetName() string {
+	return m.FirstName
+}
+
+func (m Contact) GetRelationshipValue() int {
+	return 0
+}
+
+func (m Contact) ToMap() map[string]any {
 	return map[string]any{
 		"ID":        m.ID,
 		"FirstName": m.FirstName,
@@ -24,13 +35,11 @@ func (m *Contact) ToMap() map[string]any {
 	}
 }
 
-func (m *Contact) ToJson() []byte {
+func (m Contact) ToJson() []byte {
 	bytes, _ := json.Marshal(m.ToMap())
 	return bytes
 }
 
-func (m *Contact) AfterCreate(tx *gorm.DB) error {
-	room := config.WS.FindRoomByName("")
-	room.BroadcastToClientsInRoom(m.ToJson())
-	return nil
-}
+// func (m Contact) AfterSave(tx *gorm.DB) error {
+// return websocket.Emit("contact-created", m)
+// }

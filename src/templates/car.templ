@@ -28,46 +28,38 @@ templ CarUpsertForm(car models.Car, carModelVersions []models.CarModelVersion) {
       hx-swap="beforeend"
     }
   >
-    <div class="form-control">
-      <label class="label" >Car Model Version</label>
-      <select class="select select-bordered" name="ModelVersionID">
-        <option disabled selected>Select an Car Model Version</option>
-        for _,carModelVersion := range carModelVersions {
-          <option
-            value={fmt.Sprintf("%d", carModelVersion.ID)}
-            if (carModelVersion.ID == car.ModelVersionID) {
-              selected="selected"
-            }
-          >{carModelVersion.Name}</option>
-        }
-      </select>
-    </div>
-    <div class="form-control">
-      <label class="label" >Color</label>
-      <input class="input input-bordered" type="text" name="Color" value={ car.Color } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Mileage</label>
-      <input class="input input-bordered" type="text" name="Mileage" value={ fmt.Sprintf("%d", car.Mileage) } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Price</label>
-      <input class="input input-bordered" type="text" name="Price" value={ fmt.Sprintf("%f", car.Price) } />
-    </div>
-    <div class="form-control">
-      <label class="label" >FuelType</label>
-      <input class="input input-bordered" type="text" name="FuelType" value={ car.FuelType } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Transmission</label>
-      <input class="input input-bordered" type="text" name="Transmission" value={ car.Transmission } />
-    </div>
+    @SelectComponent("CarModelVersion", "ModelVersionID", listToMap[models.CarModelVersion](carModelVersions))
+    @CarForm("")
+
     <button class="btn mt-3">Save</button>
     if (car.ID != 0) {
     <button class="btn" hx-get={getEndpoint("cars", "show", car.ID)}>Cancel</button>
     }
     <span class="htmx-indicator">Loading...</span>
   </form>
+}
+
+templ CarForm(prefix string) {
+  <div class="form-control">
+    <label class="label" >Color</label>
+    <input class="input input-bordered" type="text" name={prefix + "Color"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >Mileage</label>
+    <input class="input input-bordered" type="text" name={prefix + "Mileage"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >Price</label>
+    <input class="input input-bordered" type="text" name={prefix + "Price"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >FuelType</label>
+    <input class="input input-bordered" type="text" name={prefix + "FuelType"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >Transmission</label>
+    <input class="input input-bordered" type="text" name={prefix + "Transmission"} />
+  </div>
 }
 
 templ CarIndexCard(car models.Car) {

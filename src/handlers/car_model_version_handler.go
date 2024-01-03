@@ -15,7 +15,7 @@ type CarModelVersionHandler struct {
 	DB *gorm.DB
 }
 
-func (h *CarModelVersionHandler) Index(c *gin.Context) {
+func (h CarModelVersionHandler) Index(c *gin.Context) {
 	carModelVersions := []models.CarModelVersion{}
 	config.DB.Preload("CarModel").Find(&carModelVersions)
 
@@ -25,7 +25,7 @@ func (h *CarModelVersionHandler) Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelVersionsIndexPage("CarModelVersions page", carModelVersions, carModels))
 }
 
-func (h *CarModelVersionHandler) Show(c *gin.Context) {
+func (h CarModelVersionHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("carModelVersion")))
 
 	carModelVersion := models.CarModelVersion{ID: ID}
@@ -34,7 +34,7 @@ func (h *CarModelVersionHandler) Show(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelVersionIndexCard(carModelVersion))
 }
 
-func (h *CarModelVersionHandler) Edit(c *gin.Context) {
+func (h CarModelVersionHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("carModelVersion")))
 
 	carModelVersion := models.CarModelVersion{ID: ID}
@@ -46,7 +46,7 @@ func (h *CarModelVersionHandler) Edit(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelVersionUpsertForm(carModelVersion, carModels))
 }
 
-func (h *CarModelVersionHandler) Create(c *gin.Context) {
+func (h CarModelVersionHandler) Create(c *gin.Context) {
 	carModelVersion := models.CarModelVersion{}
 
 	carModels := []models.CarModel{}
@@ -55,11 +55,11 @@ func (h *CarModelVersionHandler) Create(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelVersionUpsertForm(carModelVersion, carModels))
 }
 
-func (h *CarModelVersionHandler) Store(c *gin.Context) {
+func (h CarModelVersionHandler) Store(c *gin.Context) {
 	var carModelVersion models.CarModelVersion
 
 	if err := c.Bind(&carModelVersion); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -69,13 +69,13 @@ func (h *CarModelVersionHandler) Store(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelVersionIndexCard(carModelVersion))
 }
 
-func (h *CarModelVersionHandler) Update(c *gin.Context) {
+func (h CarModelVersionHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("carModelVersion")))
 
 	carModelVersion := models.CarModelVersion{ID: ID}
 
 	if err := c.Bind(&carModelVersion); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (h *CarModelVersionHandler) Update(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelVersionIndexCard(carModelVersion))
 }
 
-func (h *CarModelVersionHandler) Delete(c *gin.Context) {
+func (h CarModelVersionHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("carModelVersion"))
 
 	config.DB.Delete(&models.CarModelVersion{ID: ID})

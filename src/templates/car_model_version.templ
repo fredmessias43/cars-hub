@@ -1,7 +1,6 @@
 package templates
 
 import "github.com/fredmessias43/car-hub/src/models"
-import "fmt"
 
 templ CarModelVersionsIndexPage(title string, car_model_versions []models.CarModelVersion, carModels []models.CarModel) {
   @BaseComponent(title) {
@@ -28,38 +27,30 @@ templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion, carModel
       hx-swap="beforeend"
     }
   >
-    <div class="form-control">
-      <label class="label" >Name</label>
-      <input class="input input-bordered" type="text" name="Name" value={ (carModelVersion.Name) } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Car Model</label>
-      <select class="select select-bordered" name="ModelID">
-        <option disabled selected>Select an Car Model</option>
-        for _,carModel := range carModels {
-          <option
-            value={fmt.Sprintf("%d", carModel.ID)}
-            if (carModel.ID == carModelVersion.ModelID) {
-              selected="selected"
-            }
-          >{carModel.Name}</option>
-        }
-      </select>
-    </div>
-    <div class="form-control">
-      <label class="label" >Specifications</label>
-      <input class="input input-bordered" type="text" name="Specifications" value={ (carModelVersion.Specifications) } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Features</label>
-      <input class="input input-bordered" type="text" name="Features" value={ (carModelVersion.Features) } />
-    </div>
+    @SelectComponent("CarModel", "ModelID", listToMap[models.CarModel](carModels))
+    @CarModelVersionForm("")
+    
     <button class="btn mt-3">Save</button>
     if (carModelVersion.ID != 0) {
     <button class="btn" hx-get={getEndpoint("car_model_versions", "show", carModelVersion.ID)}>Cancel</button>
     }
     <span class="htmx-indicator">Loading...</span>
   </form>
+}
+
+templ CarModelVersionForm(prefix string) {
+  <div class="form-control">
+    <label class="label" >Name</label>
+    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >Specifications</label>
+    <input class="input input-bordered" type="text" name={prefix + "Specifications"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >Features</label>
+    <input class="input input-bordered" type="text" name={prefix + "Features"} />
+  </div>
 }
 
 templ CarModelVersionIndexCard(carModelVersion models.CarModelVersion) {

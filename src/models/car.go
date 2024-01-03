@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 
-	"github.com/fredmessias43/car-hub/src/config"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +18,19 @@ type Car struct {
 	CarModelVersion CarModelVersion `gorm:"foreignKey:ModelVersionID" form:"-"`
 }
 
-func (m *Car) ToMap() map[string]any {
+func (m Car) GetID() int {
+	return m.ID
+}
+
+func (m Car) GetName() string {
+	return m.Color
+}
+
+func (m Car) GetRelationshipValue() int {
+	return m.ModelVersionID
+}
+
+func (m Car) ToMap() map[string]any {
 	return map[string]any{
 		"ID":             m.ID,
 		"ModelVersionID": m.ModelVersionID,
@@ -31,13 +42,11 @@ func (m *Car) ToMap() map[string]any {
 	}
 }
 
-func (m *Car) ToJson() []byte {
+func (m Car) ToJson() []byte {
 	bytes, _ := json.Marshal(m.ToMap())
 	return bytes
 }
 
-func (m *Car) AfterCreate(tx *gorm.DB) error {
-	room := config.WS.FindRoomByName("")
-	room.BroadcastToClientsInRoom(m.ToJson())
-	return nil
-}
+// func (m Car) AfterSave(tx *gorm.DB) error {
+// return websocket.Emit("car-created", m)
+// }

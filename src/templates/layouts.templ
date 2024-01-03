@@ -1,5 +1,7 @@
 package templates
 
+import "fmt"
+
 templ BaseComponent(title string) {
   <!DOCTYPE html>
   <html lang="en" data-theme="emerald" >
@@ -113,4 +115,21 @@ templ SelectOption(label string, value string, selected bool) {
       selected="selected"
     }
   >{label}</option>
+}
+
+templ SelectComponent(label string, relationshipKey string, models []map[string]interface{} ) {
+  <div class="form-control">
+    <label class="label" >{label}</label>
+    <select class="select select-bordered" name={relationshipKey}>
+      <option disabled selected>Select an {label}</option>
+      for _,model := range models {
+        <option
+          value={fmt.Sprintf("%d", model["ID"])}
+          if (model["ID"] == model[relationshipKey]) {
+            selected="selected"
+          }
+        >{fmt.Sprintf("%s", model["Name"])}</option>
+      }
+    </select>
+  </div>
 }

@@ -35,6 +35,8 @@ func main() {
 		websocket.ServeWs(config.WS, c.Writer, c.Request)
 	})
 
+	// Pages
+
 	contactHandler := handlers.ContactHandler{}
 	routerResource(config.Router, "contact", &contactHandler)
 
@@ -52,6 +54,12 @@ func main() {
 
 	carHandler := handlers.CarHandler{}
 	routerResource(config.Router, "car", &carHandler)
+
+	// Other Pages
+
+	integratedHandler := handlers.IntegratedHandler{}
+	config.Router.GET("/integrated", integratedHandler.Index)
+	config.Router.POST("/integrated", integratedHandler.Store)
 
 	// Components
 

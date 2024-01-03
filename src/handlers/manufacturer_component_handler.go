@@ -15,7 +15,7 @@ type ManufacturerComponentHandler struct {
 	DB *gorm.DB
 }
 
-func (h *ManufacturerComponentHandler) ShowOptionComponent(c *gin.Context) {
+func (h ManufacturerComponentHandler) ShowOptionComponent(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("manufacturer")))
 
 	manufacturer := models.Manufacturer{}

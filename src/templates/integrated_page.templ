@@ -1,0 +1,70 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+
+templ IntegratedPage(manufacturers models.List[models.Manufacturer], brands models.List[models.Brand], carModels models.List[models.CarModel], carModelVersions models.List[models.CarModelVersion], cars models.List[models.Car]) {
+  @BaseComponent("Integrated Page") {
+    <form
+      hx-post={"/integrated"}
+    >
+      <h1 class="border-solid border-b-4" >Manufacturer</h1>
+      <h3>Select a already created</h3>
+      <div class="form-container px-6">
+        @SelectComponent("", "Manufacturer.ID", manufacturers.ToMap())
+      </div>
+      <div class="divider">ou</div>
+      <h3>Create a new</h3>
+      <div class="form-container px-6">
+        @ManufacturerForm("Manufacturer.")
+      </div>
+
+      <h1 class="border-solid border-b-4" >Brand</h1>
+      <h3>Select a already created</h3>
+      <div class="form-container px-6">
+        @SelectComponent("", "Brand.ID", brands.ToMap())
+      </div>
+      <div class="divider">ou</div>
+      <h3>Create a new</h3>
+      <div class="form-container px-6">
+        @BrandForm("Brand.")
+      </div>
+
+      <h1 class="border-solid border-b-4" >Car Model</h1>
+      <h3>Select a already created</h3>
+      <div class="form-container px-6">
+        @SelectComponent("", "CarModel.ID", carModels.ToMap())
+      </div>
+      <div class="divider">ou</div>
+      <h3>Create a new</h3>
+      <div class="form-container px-6">
+        @CarModelForm("CarModel.")
+      </div>
+
+      <h1 class="border-solid border-b-4" >Car Model Version</h1>
+      <h3>Select a already created</h3>
+      <div class="form-container px-6">
+        @SelectComponent("", "CarModelVersion.ID", carModelVersions.ToMap())
+      </div>
+      <div class="divider">ou</div>
+      <h3>Create a new</h3>
+      <div class="form-container px-6">
+        @CarModelVersionForm("CarModelVersion.")
+      </div>
+
+      <h1 class="border-solid border-b-4" >Car</h1>
+      <h3>Create a new</h3>
+      <div class="form-container px-6">
+        @CarForm("Car.")
+      </div>
+
+      <button class="btn mt-3">Save</button>
+      <span class="htmx-indicator">Loading...</span>
+    </form>
+	}
+}
+
+/* <h3>Select a already created</h3>
+<div class="form-container px-6">
+  @SelectComponent("", "Car.ID", cars.ToMap())
+</div>
+<div class="divider">ou</div> */

@@ -11,3 +11,8 @@ type Handler interface {
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 }
+
+type Model interface {
+	ToMap() map[string]any
+	ToJson() []byte
+}

@@ -1,7 +1,6 @@
 package templates
 
 import "github.com/fredmessias43/car-hub/src/models"
-import "fmt"
 
 templ BrandsIndexPage(title string, brands []models.Brand, manufacturers []models.Manufacturer) {
   @BaseComponent(title) {
@@ -28,30 +27,22 @@ templ BrandUpsertForm(brand models.Brand, manufacturers []models.Manufacturer) {
       hx-swap="beforeend"
     }
   >
-    <div class="form-control">
-      <label class="label" >Name</label>
-      <input class="input input-bordered" type="text" name="Name" value={ brand.Name } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Manufacturer</label>
-      <select class="select select-bordered" id="manufacturer-select" name="ManufacturerID">
-        <option disabled selected>Select an Manufacturer</option>
-        for _,manufacturer := range manufacturers {
-          <option
-            value={fmt.Sprintf("%d", manufacturer.ID)}
-            if (manufacturer.ID == brand.ManufacturerID) {
-              selected="selected"
-            }
-          >{manufacturer.Name}</option>
-        }
-      </select>
-    </div>
+    @SelectComponent("Manufacturer", "ManufacturerID", listToMap[models.Manufacturer](manufacturers))
+    @BrandForm("")
+
     <button class="btn mt-3">Save</button>
     if (brand.ID != 0) {
     <button class="btn" hx-get={getEndpoint("brands", "show", brand.ID)}>Cancel</button>
     }
     <span class="htmx-indicator">Loading...</span>
   </form>
+}
+
+templ BrandForm(prefix string) {
+  <div class="form-control">
+    <label class="label" >Name</label>
+    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+  </div>
 }
 
 templ BrandIndexCard(brand models.Brand) {

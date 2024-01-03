@@ -15,14 +15,14 @@ type ContactHandler struct {
 	DB *gorm.DB
 }
 
-func (h *ContactHandler) Index(c *gin.Context) {
+func (h ContactHandler) Index(c *gin.Context) {
 	contacts := []models.Contact{}
 	config.DB.Find(&contacts)
 
 	c.HTML(http.StatusOK, "", templates.ContactsIndexPage("Contacts page", contacts))
 }
 
-func (h *ContactHandler) Show(c *gin.Context) {
+func (h ContactHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("contact")))
 
 	contact := models.Contact{}
@@ -31,7 +31,7 @@ func (h *ContactHandler) Show(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
 }
 
-func (h *ContactHandler) Edit(c *gin.Context) {
+func (h ContactHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("contact")))
 
 	contact := models.Contact{}
@@ -40,16 +40,16 @@ func (h *ContactHandler) Edit(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.ContactUpsertForm(contact))
 }
 
-func (h *ContactHandler) Create(c *gin.Context) {
+func (h ContactHandler) Create(c *gin.Context) {
 	contact := models.Contact{}
 	c.HTML(http.StatusOK, "", templates.ContactUpsertForm(contact))
 }
 
-func (h *ContactHandler) Store(c *gin.Context) {
+func (h ContactHandler) Store(c *gin.Context) {
 	var contact models.Contact
 
 	if err := c.Bind(&contact); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -58,14 +58,14 @@ func (h *ContactHandler) Store(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
 }
 
-func (h *ContactHandler) Update(c *gin.Context) {
+func (h ContactHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("contact")))
 
 	contact := models.Contact{}
 	_ = config.DB.Find(&contact, ID)
 
 	if err := c.Bind(&contact); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -74,7 +74,7 @@ func (h *ContactHandler) Update(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
 }
 
-func (h *ContactHandler) Delete(c *gin.Context) {
+func (h ContactHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("contact"))
 
 	config.DB.Delete(&models.Contact{}, ID)

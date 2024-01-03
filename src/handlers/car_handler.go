@@ -15,7 +15,7 @@ type CarHandler struct {
 	DB *gorm.DB
 }
 
-func (h *CarHandler) Index(c *gin.Context) {
+func (h CarHandler) Index(c *gin.Context) {
 	cars := []models.Car{}
 	config.DB.Preload("CarModelVersion").Find(&cars)
 
@@ -25,7 +25,7 @@ func (h *CarHandler) Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarsIndexPage("Cars page", cars, carModelVersions))
 }
 
-func (h *CarHandler) Show(c *gin.Context) {
+func (h CarHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car")))
 
 	car := models.Car{ID: ID}
@@ -34,7 +34,7 @@ func (h *CarHandler) Show(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarIndexCard(car))
 }
 
-func (h *CarHandler) Edit(c *gin.Context) {
+func (h CarHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car")))
 
 	car := models.Car{ID: ID}
@@ -46,7 +46,7 @@ func (h *CarHandler) Edit(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarUpsertForm(car, carModelVersions))
 }
 
-func (h *CarHandler) Create(c *gin.Context) {
+func (h CarHandler) Create(c *gin.Context) {
 	car := models.Car{}
 
 	carModelVersions := []models.CarModelVersion{}
@@ -55,11 +55,11 @@ func (h *CarHandler) Create(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarUpsertForm(car, carModelVersions))
 }
 
-func (h *CarHandler) Store(c *gin.Context) {
+func (h CarHandler) Store(c *gin.Context) {
 	var car models.Car
 
 	if err := c.Bind(&car); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -69,13 +69,13 @@ func (h *CarHandler) Store(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarIndexCard(car))
 }
 
-func (h *CarHandler) Update(c *gin.Context) {
+func (h CarHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car")))
 
 	car := models.Car{ID: ID}
 
 	if err := c.Bind(&car); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (h *CarHandler) Update(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarIndexCard(car))
 }
 
-func (h *CarHandler) Delete(c *gin.Context) {
+func (h CarHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("car"))
 
 	config.DB.Delete(&models.Car{ID: ID})

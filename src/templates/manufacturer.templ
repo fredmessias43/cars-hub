@@ -27,14 +27,7 @@ templ ManufacturerUpsertForm(manufacturer models.Manufacturer) {
       hx-swap="beforeend"
     }
   >
-    <div class="form-control">
-      <label class="label" >First Name</label>
-      <input class="input input-bordered" type="text" name="Name" value={ manufacturer.Name } />
-    </div>
-    <div class="form-control">
-      <label class="label" >Last Name</label>
-      <input class="input input-bordered" type="text" name="CountryOrigin" value={ manufacturer.CountryOrigin } />
-    </div>
+    @ManufacturerForm("")
     <button class="btn mt-3">Save</button>
     if (manufacturer.ID != 0) {
     <button class="btn" hx-get={getEndpoint("manufacturers", "show", manufacturer.ID)}>Cancel</button>
@@ -42,6 +35,18 @@ templ ManufacturerUpsertForm(manufacturer models.Manufacturer) {
     <span class="htmx-indicator">Loading...</span>
   </form>
 }
+
+templ ManufacturerForm(prefix string) {
+  <div class="form-control">
+    <label class="label" >Name</label>
+    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+  </div>
+  <div class="form-control">
+    <label class="label" >CountryOrigin</label>
+    <input class="input input-bordered" type="text" name={prefix + "CountryOrigin"} />
+  </div>
+}
+
 
 templ ManufacturerIndexCard(manufacturer models.Manufacturer) {
   <div hx-target="this" hx-swap="outerHTML">

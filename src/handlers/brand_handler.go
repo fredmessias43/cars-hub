@@ -15,7 +15,7 @@ type BrandHandler struct {
 	DB *gorm.DB
 }
 
-func (h *BrandHandler) Index(c *gin.Context) {
+func (h BrandHandler) Index(c *gin.Context) {
 	brands := []models.Brand{}
 	config.DB.Preload("Manufacturer").Find(&brands)
 
@@ -25,7 +25,7 @@ func (h *BrandHandler) Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.BrandsIndexPage("Brands page", brands, manufacturers))
 }
 
-func (h *BrandHandler) Show(c *gin.Context) {
+func (h BrandHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("brand")))
 
 	brand := models.Brand{ID: ID}
@@ -34,7 +34,7 @@ func (h *BrandHandler) Show(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.BrandIndexCard(brand))
 }
 
-func (h *BrandHandler) Edit(c *gin.Context) {
+func (h BrandHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("brand")))
 
 	brand := models.Brand{}
@@ -46,7 +46,7 @@ func (h *BrandHandler) Edit(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.BrandUpsertForm(brand, manufacturers))
 }
 
-func (h *BrandHandler) Create(c *gin.Context) {
+func (h BrandHandler) Create(c *gin.Context) {
 	brand := models.Brand{}
 
 	manufacturers := []models.Manufacturer{}
@@ -55,11 +55,11 @@ func (h *BrandHandler) Create(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.BrandUpsertForm(brand, manufacturers))
 }
 
-func (h *BrandHandler) Store(c *gin.Context) {
+func (h BrandHandler) Store(c *gin.Context) {
 	brand := models.Brand{}
 
 	if err := c.Bind(&brand); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -69,12 +69,12 @@ func (h *BrandHandler) Store(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.BrandIndexCard(brand))
 }
 
-func (h *BrandHandler) Update(c *gin.Context) {
+func (h BrandHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("brand")))
 
 	brand := models.Brand{ID: ID}
 	if err := c.ShouldBind(&brand); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (h *BrandHandler) Update(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.BrandIndexCard(brand))
 }
 
-func (h *BrandHandler) Delete(c *gin.Context) {
+func (h BrandHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("brand"))
 
 	config.DB.Delete(&models.Brand{ID: ID}, ID)

@@ -15,7 +15,7 @@ type CarModelHandler struct {
 	DB *gorm.DB
 }
 
-func (h *CarModelHandler) Index(c *gin.Context) {
+func (h CarModelHandler) Index(c *gin.Context) {
 	car_models := []models.CarModel{}
 	config.DB.Preload("Brand").Find(&car_models)
 
@@ -25,7 +25,7 @@ func (h *CarModelHandler) Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelsIndexPage("CarModels page", car_models, brands))
 }
 
-func (h *CarModelHandler) Show(c *gin.Context) {
+func (h CarModelHandler) Show(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car_model")))
 
 	car_model := models.CarModel{}
@@ -34,7 +34,7 @@ func (h *CarModelHandler) Show(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelIndexCard(car_model))
 }
 
-func (h *CarModelHandler) Edit(c *gin.Context) {
+func (h CarModelHandler) Edit(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car_model")))
 
 	car_model := models.CarModel{}
@@ -46,7 +46,7 @@ func (h *CarModelHandler) Edit(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelUpsertForm(car_model, brands))
 }
 
-func (h *CarModelHandler) Create(c *gin.Context) {
+func (h CarModelHandler) Create(c *gin.Context) {
 	car_model := models.CarModel{}
 
 	brands := []models.Brand{}
@@ -55,11 +55,11 @@ func (h *CarModelHandler) Create(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelUpsertForm(car_model, brands))
 }
 
-func (h *CarModelHandler) Store(c *gin.Context) {
+func (h CarModelHandler) Store(c *gin.Context) {
 	var car_model models.CarModel
 
 	if err := c.Bind(&car_model); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -69,13 +69,13 @@ func (h *CarModelHandler) Store(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelIndexCard(car_model))
 }
 
-func (h *CarModelHandler) Update(c *gin.Context) {
+func (h CarModelHandler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param(("car_model")))
 
 	car_model := models.CarModel{ID: ID}
 
 	if err := c.Bind(&car_model); err != nil {
-		c.HTML(http.StatusBadRequest, "", err)
+		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (h *CarModelHandler) Update(c *gin.Context) {
 	c.HTML(http.StatusOK, "", templates.CarModelIndexCard(car_model))
 }
 
-func (h *CarModelHandler) Delete(c *gin.Context) {
+func (h CarModelHandler) Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("car_model"))
 
 	config.DB.Delete(&models.CarModel{}, ID)
