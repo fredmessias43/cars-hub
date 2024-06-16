@@ -1,6 +1,11 @@
 package templates
 
-import "fmt"
+import (
+  "fmt"
+  "time"
+)
+
+var year = fmt.Sprintf("%d", time.Now().Year())
 
 templ BaseComponent(title string) {
   <!DOCTYPE html>
@@ -45,7 +50,7 @@ templ BaseComponent(title string) {
       </div>
     </header>
 
-    <main>
+    <main hx-ext="response-targets">
       @AsideComponent()
 
       <div class="content">
@@ -55,13 +60,14 @@ templ BaseComponent(title string) {
 
     <footer class="footer footer-center p-4 bg-base-300 text-base-content">
       <div>
-        <p>Copyright © 2023 - All right reserved by ACME Industries Ltd</p>
+        <p>Copyright ©{year} - All right reserved by ACME Industries Ltd</p>
       </div>
     </footer>
 
     <script src="https://unpkg.com/htmx.org@1.9.4"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
 
     <script src="/assets/js/index.js"></script>
   </body>
@@ -117,19 +123,28 @@ templ SelectOption(label string, value string, selected bool) {
   >{label}</option>
 }
 
-templ SelectComponent(label string, relationshipKey string, models []map[string]interface{} ) {
+templ SelectComponent(label string, relationshipModel map[string]any, relationshipKey string, models []map[string]interface{} ) {
   <div class="form-control">
     <label class="label" >{label}</label>
     <select class="select select-bordered" name={relationshipKey}>
-      <option disabled selected>Select an {label}</option>
+      <option selected value="0" >Select an {label}</option>
       for _,model := range models {
         <option
           value={fmt.Sprintf("%d", model["ID"])}
-          if (model["ID"] == model[relationshipKey]) {
+          if (model["ID"] == model[relationshipKey] || model["ID"] == relationshipModel["ID"]) {
             selected="selected"
           }
         >{fmt.Sprintf("%s", model["Name"])}</option>
       }
     </select>
+  </div>
+}
+
+templ UnprocessableEntity(err error) {
+  <div class="alert alert-error">
+    <div class="flex-1">
+      <label>Error</label>
+      <p>{err.Error()}</p>
+    </div>
   </div>
 }

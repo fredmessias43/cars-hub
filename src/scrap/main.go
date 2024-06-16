@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 
+	"github.com/fredmessias43/car-hub/src/config"
 	"github.com/fredmessias43/car-hub/src/contracts"
+	"github.com/fredmessias43/car-hub/src/database"
 	"github.com/fredmessias43/car-hub/src/models"
 )
 
@@ -14,14 +17,33 @@ func getDynamicValue(model contracts.Model, key string) string {
 }
 
 func main() {
-	manufacturer := models.Manufacturer{ID: 123, Name: "manufacturer 1"}
+	var err error
+	config.DB, err = database.NewDatabaseClient()
+	if err != nil {
+		panic("failed to connect database: " + err.Error())
+	}
 
-	// value := getDynamicValue(&manufacturer, "ID")
+	/*
+		manufacturer_ID, _ := strconv.Atoi("")
+		manufacturer := models.Manufacturer{}
+		if manufacturer_ID == 0 {
+			manufacturer.Name = "Teste"
+			manufacturer.CountryOrigin = "Pais Teste"
+			config.DB.Save(&manufacturer)
+			}
+			if manufacturer_ID != 0 {
+				config.DB.Find(&manufacturer, manufacturer_ID)
+				} */
 
-	fmt.Println(manufacturer.ToMap())
+	manufacturer_ID, _ := strconv.Atoi("")
+	manufacturer := models.Manufacturer{
+		ID:            manufacturer_ID,
+		Name:          "Test asdasde",
+		CountryOrigin: "Pais Teste",
+	}
+	config.DB.Save(&manufacturer)
 
-	// a := models.List[models.CarModelVersion]{}
-	// fmt.Println(a.Value[0].Name)
+	fmt.Print(manufacturer.Name)
 }
 
 /* manufacturer

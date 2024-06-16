@@ -14,3 +14,8 @@
 
 - [ ] fazer deploy em alguma plataforma
 - [ ] montar ambiente docker
+
+## install
+
+`go install github.com/a-h/templ/cmd/templ@latest`
+`go install github.com/air-verse/air@latest`

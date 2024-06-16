@@ -27,8 +27,8 @@ templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion, carModel
       hx-swap="beforeend"
     }
   >
-    @SelectComponent("CarModel", "ModelID", listToMap[models.CarModel](carModels))
-    @CarModelVersionForm("")
+    @SelectComponent("CarModel", carModelVersion.CarModel.ToMap(), "ModelID", listToMap[models.CarModel](carModels))
+    @CarModelVersionForm(carModelVersion, "")
     
     <button class="btn mt-3">Save</button>
     if (carModelVersion.ID != 0) {
@@ -38,18 +38,18 @@ templ CarModelVersionUpsertForm(carModelVersion models.CarModelVersion, carModel
   </form>
 }
 
-templ CarModelVersionForm(prefix string) {
+templ CarModelVersionForm(carModelVersion models.CarModelVersion, prefix string) {
   <div class="form-control">
     <label class="label" >Name</label>
-    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+    <input class="input input-bordered" type="text" name={prefix + "Name"} value={ carModelVersion.Name } />
   </div>
   <div class="form-control">
     <label class="label" >Specifications</label>
-    <input class="input input-bordered" type="text" name={prefix + "Specifications"} />
+    <input class="input input-bordered" type="text" name={prefix + "Specifications"} value={ carModelVersion.Features } />
   </div>
   <div class="form-control">
     <label class="label" >Features</label>
-    <input class="input input-bordered" type="text" name={prefix + "Features"} />
+    <input class="input input-bordered" type="text" name={prefix + "Features"}  value={ carModelVersion.Specifications } />
   </div>
 }
 

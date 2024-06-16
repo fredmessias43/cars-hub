@@ -27,7 +27,7 @@ templ ManufacturerUpsertForm(manufacturer models.Manufacturer) {
       hx-swap="beforeend"
     }
   >
-    @ManufacturerForm("")
+    @ManufacturerForm(manufacturer, "")
     <button class="btn mt-3">Save</button>
     if (manufacturer.ID != 0) {
     <button class="btn" hx-get={getEndpoint("manufacturers", "show", manufacturer.ID)}>Cancel</button>
@@ -36,14 +36,14 @@ templ ManufacturerUpsertForm(manufacturer models.Manufacturer) {
   </form>
 }
 
-templ ManufacturerForm(prefix string) {
+templ ManufacturerForm(manufacturer models.Manufacturer, prefix string) {
   <div class="form-control">
     <label class="label" >Name</label>
-    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+    <input class="input input-bordered" type="text" name={prefix + "Name"} value={ manufacturer.Name } />
   </div>
   <div class="form-control">
     <label class="label" >CountryOrigin</label>
-    <input class="input input-bordered" type="text" name={prefix + "CountryOrigin"} />
+    <input class="input input-bordered" type="text" name={prefix + "CountryOrigin"} value={ manufacturer.CountryOrigin } />
   </div>
 }
 

@@ -28,8 +28,8 @@ templ CarUpsertForm(car models.Car, carModelVersions []models.CarModelVersion) {
       hx-swap="beforeend"
     }
   >
-    @SelectComponent("CarModelVersion", "ModelVersionID", listToMap[models.CarModelVersion](carModelVersions))
-    @CarForm("")
+    @SelectComponent("CarModelVersion", car.CarModelVersion.ToMap(), "ModelVersionID", listToMap[models.CarModelVersion](carModelVersions))
+    @CarForm(car, "")
 
     <button class="btn mt-3">Save</button>
     if (car.ID != 0) {
@@ -39,26 +39,26 @@ templ CarUpsertForm(car models.Car, carModelVersions []models.CarModelVersion) {
   </form>
 }
 
-templ CarForm(prefix string) {
+templ CarForm(car models.Car, prefix string) {
   <div class="form-control">
     <label class="label" >Color</label>
-    <input class="input input-bordered" type="text" name={prefix + "Color"} />
+    <input class="input input-bordered" type="text" name={prefix + "Color"} value={ car.Color }/>
   </div>
   <div class="form-control">
     <label class="label" >Mileage</label>
-    <input class="input input-bordered" type="text" name={prefix + "Mileage"} />
+    <input class="input input-bordered" type="text" name={prefix + "Mileage"} value={ fmt.Sprintf("%d", car.Mileage) }/>
   </div>
   <div class="form-control">
     <label class="label" >Price</label>
-    <input class="input input-bordered" type="text" name={prefix + "Price"} />
+    <input class="input input-bordered" type="text" name={prefix + "Price"} value={ fmt.Sprintf("%f", car.Price) }/>
   </div>
   <div class="form-control">
     <label class="label" >FuelType</label>
-    <input class="input input-bordered" type="text" name={prefix + "FuelType"} />
+    <input class="input input-bordered" type="text" name={prefix + "FuelType"} value={ car.FuelType }/>
   </div>
   <div class="form-control">
     <label class="label" >Transmission</label>
-    <input class="input input-bordered" type="text" name={prefix + "Transmission"} />
+    <input class="input input-bordered" type="text" name={prefix + "Transmission"} value={ car.Transmission }/>
   </div>
 }
 

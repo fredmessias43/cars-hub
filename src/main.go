@@ -58,8 +58,10 @@ func main() {
 	// Other Pages
 
 	integratedHandler := handlers.IntegratedHandler{}
-	config.Router.GET("/integrated", integratedHandler.Index)
+	config.Router.GET("/integrated", integratedHandler.Create)
 	config.Router.POST("/integrated", integratedHandler.Store)
+	config.Router.GET("/integrated/:car/edit", integratedHandler.Edit)
+	config.Router.PUT("/integrated/:car", integratedHandler.Update)
 
 	// Components
 

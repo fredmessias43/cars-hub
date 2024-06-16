@@ -28,8 +28,8 @@ templ CarModelUpsertForm(carModel models.CarModel, brands []models.Brand) {
       hx-swap="beforeend"
     }
   >
-    @SelectComponent("Brand", "BrandID", listToMap[models.Brand](brands))
-    @CarModelForm("")
+    @SelectComponent("Brand", carModel.Brand.ToMap(), "BrandID", listToMap[models.Brand](brands))
+    @CarModelForm(carModel, "")
 
     <button class="btn mt-3">Save</button>
     if (carModel.ID != 0) {
@@ -39,14 +39,14 @@ templ CarModelUpsertForm(carModel models.CarModel, brands []models.Brand) {
   </form>
 }
 
-templ CarModelForm(prefix string) {
+templ CarModelForm(carModel models.CarModel, prefix string) {
   <div class="form-control">
     <label class="label" >Name</label>
-    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+    <input class="input input-bordered" type="text" name={prefix + "Name"} value={ carModel.Name } />
   </div>
   <div class="form-control">
     <label class="label" >Manufacturer Year</label>
-    <input class="input input-bordered" type="number" name={prefix + "ManufactureYear"} />
+    <input class="input input-bordered" type="number" name={prefix + "ManufactureYear"} value={ fmt.Sprintf("%d", carModel.ManufactureYear) } />
   </div>
 }
 

@@ -27,8 +27,8 @@ templ BrandUpsertForm(brand models.Brand, manufacturers []models.Manufacturer) {
       hx-swap="beforeend"
     }
   >
-    @SelectComponent("Manufacturer", "ManufacturerID", listToMap[models.Manufacturer](manufacturers))
-    @BrandForm("")
+    @SelectComponent("Manufacturer", brand.Manufacturer.ToMap(), "ManufacturerID", listToMap[models.Manufacturer](manufacturers))
+    @BrandForm(brand, "")
 
     <button class="btn mt-3">Save</button>
     if (brand.ID != 0) {
@@ -38,10 +38,10 @@ templ BrandUpsertForm(brand models.Brand, manufacturers []models.Manufacturer) {
   </form>
 }
 
-templ BrandForm(prefix string) {
+templ BrandForm(brand models.Brand,prefix string) {
   <div class="form-control">
     <label class="label" >Name</label>
-    <input class="input input-bordered" type="text" name={prefix + "Name"} />
+    <input class="input input-bordered" type="text" name={prefix + "Name"} value={ brand.Name } />
   </div>
 }
 
