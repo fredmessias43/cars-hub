@@ -1,0 +1,76 @@
+package templates
+
+templ LoginPage() {
+  @BaseAuthPage("Login") {
+    <div class="card p-8 shadow-lg">
+      <div class="card-header">
+        <h3 class="card-title">Login</h3>
+      </div>
+
+      <div class="card-body">  
+        <form
+          hx-post="/login"
+          hx-target-401="#errors"
+        >
+          <div class="form-control">
+            <label class="label" >Email</label>
+            <input class="input input-bordered" type="text" name={"Email"} />
+          </div>
+          <div class="form-control">
+            <label class="label" >Password</label>
+            <input class="input input-bordered" type="text" name={"Password"} />
+          </div>
+
+          <div id="errors"></div>
+
+          <div class="flex items-center justify-between">
+            <a href="/register" class="">Register</a>
+            <button class="btn mt-3">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+	}
+}
+
+templ RegisterPage() {
+  @BaseAuthPage("Register") {
+    <div class="card p-8 shadow-lg">
+      <div class="card-header">
+        <h3 class="card-title">Register</h3>
+      </div>
+
+      <div class="card-body">  
+        <form
+          hx-post="/register"
+        >
+          <div class="form-control">
+            <label class="label" >FirstName</label>
+            <input class="input input-bordered" type="text" name={"FirstName"} />
+          </div>
+          <div class="form-control">
+            <label class="label" >LastName</label>
+            <input class="input input-bordered" type="text" name={"LastName"} />
+          </div>
+          <div class="form-control">
+            <label class="label" >Email</label>
+            <input class="input input-bordered" type="text" name={"Email"} />
+          </div>
+          <div class="form-control">
+            <label class="label" >Password</label>
+            <input class="input input-bordered" type="text" name={"Password"} />
+          </div>
+          <div class="form-control">
+            <label class="label" >ConfirmPassword</label>
+            <input class="input input-bordered" type="text" name={"ConfirmPassword"} />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <a href="/login" class="">Login</a>
+            <button class="btn mt-3">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+}

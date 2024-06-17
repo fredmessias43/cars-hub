@@ -1,0 +1,59 @@
+package templates
+
+import "github.com/fredmessias43/car-hub/src/models"
+
+templ UsersIndexPage(title string, users []models.User) {
+  @BaseComponent(title) {
+		@UserUpsertForm(models.User{})
+
+    <div id="user-list">
+      for _,user := range users {
+        @UserIndexCard(user)
+      }
+    </div>
+	}
+}
+
+templ UserUpsertForm(user models.User) {
+  <form 
+    if (user.ID != 0) {
+      hx-put={getEndpoint("users", "update", user.ID)}
+      hx-target="this" 
+      hx-swap="outerHTML"
+    }
+    else {
+      hx-post={getEndpoint("users", "store", user.ID)}
+      hx-target="#user-list" 
+      hx-swap="beforeend"
+    }
+  >
+    <div class="form-control">
+      <label class="label" >First Name</label>
+      <input class="input input-bordered" type="text" name="FirstName" value={ user.FirstName } />
+    </div>
+    <div class="form-control">
+      <label class="label" >Last Name</label>
+      <input class="input input-bordered" type="text" name="LastName" value={ user.LastName } />
+    </div>
+    <div class="form-control">
+      <label class="label" >Email</label>
+      <input class="input input-bordered" type="email" name="Email" value={ user.Email } />
+    </div>
+    <button class="btn mt-3">Save</button>
+    if (user.ID != 0) {
+    <button class="btn" hx-get={getEndpoint("users", "show", user.ID)}>Cancel</button>
+    }
+    <span class="htmx-indicator">Loading...</span>
+  </form>
+}
+
+templ UserIndexCard(user models.User) {
+  <div hx-target="this" hx-swap="outerHTML">
+    <div><label>First Name</label>: { user.FirstName }</div>
+    <div><label>Last Name</label>: { user.LastName }</div>
+    <div><label>Email</label>: { user.Email }</div>
+    <button hx-get={getEndpoint("users", "edit", user.ID)} class="btn btn-primary">Edit</button>
+    <button class="btn btn-error" hx-delete={getEndpoint("users", "delete", user.ID)}>Delete</button>
+    <span class="htmx-indicator">Loading...</span>
+  </div>
+}

@@ -11,73 +11,73 @@ import (
 	"gorm.io/gorm"
 )
 
-type ContactHandler struct {
+type UserHandler struct {
 	DB *gorm.DB
 }
 
-func (h ContactHandler) Index(c *gin.Context) {
-	contacts := []models.Contact{}
-	config.DB.Find(&contacts)
+func (h UserHandler) Index(c *gin.Context) {
+	users := []models.User{}
+	config.DB.Find(&users)
 
-	c.HTML(http.StatusOK, "", templates.ContactsIndexPage("Contacts page", contacts))
+	c.HTML(http.StatusOK, "", templates.UsersIndexPage("Users page", users))
 }
 
-func (h ContactHandler) Show(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param(("contact")))
+func (h UserHandler) Show(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param(("user")))
 
-	contact := models.Contact{}
-	_ = config.DB.Find(&contact, ID)
+	user := models.User{}
+	_ = config.DB.Find(&user, ID)
 
-	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
+	c.HTML(http.StatusOK, "", templates.UserIndexCard(user))
 }
 
-func (h ContactHandler) Edit(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param(("contact")))
+func (h UserHandler) Edit(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param(("user")))
 
-	contact := models.Contact{}
-	_ = config.DB.Find(&contact, ID)
+	user := models.User{}
+	_ = config.DB.Find(&user, ID)
 
-	c.HTML(http.StatusOK, "", templates.ContactUpsertForm(contact))
+	c.HTML(http.StatusOK, "", templates.UserUpsertForm(user))
 }
 
-func (h ContactHandler) Create(c *gin.Context) {
-	contact := models.Contact{}
-	c.HTML(http.StatusOK, "", templates.ContactUpsertForm(contact))
+func (h UserHandler) Create(c *gin.Context) {
+	user := models.User{}
+	c.HTML(http.StatusOK, "", templates.UserUpsertForm(user))
 }
 
-func (h ContactHandler) Store(c *gin.Context) {
-	var contact models.Contact
+func (h UserHandler) Store(c *gin.Context) {
+	var user models.User
 
-	if err := c.Bind(&contact); err != nil {
+	if err := c.Bind(&user); err != nil {
 		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
-	_ = config.DB.Create(&contact)
+	_ = config.DB.Create(&user)
 
-	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
+	c.HTML(http.StatusOK, "", templates.UserIndexCard(user))
 }
 
-func (h ContactHandler) Update(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param(("contact")))
+func (h UserHandler) Update(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param(("user")))
 
-	contact := models.Contact{}
-	_ = config.DB.Find(&contact, ID)
+	user := models.User{}
+	_ = config.DB.Find(&user, ID)
 
-	if err := c.Bind(&contact); err != nil {
+	if err := c.Bind(&user); err != nil {
 		c.HTML(http.StatusUnprocessableEntity, "", err)
 		return
 	}
 
-	config.DB.Model(&contact).Where("ID = ?", ID).Updates(&contact)
+	config.DB.Model(&user).Where("ID = ?", ID).Updates(&user)
 
-	c.HTML(http.StatusOK, "", templates.ContactIndexCard(contact))
+	c.HTML(http.StatusOK, "", templates.UserIndexCard(user))
 }
 
-func (h ContactHandler) Delete(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Param("contact"))
+func (h UserHandler) Delete(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param("user"))
 
-	config.DB.Delete(&models.Contact{}, ID)
+	config.DB.Delete(&models.User{}, ID)
 
 	c.HTML(http.StatusOK, "", templates.NoContent())
 }

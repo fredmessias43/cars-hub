@@ -32,7 +32,7 @@ func NewDatabaseClient() (db *gorm.DB, err error) {
 		return nil, err
 	}
 	db.AutoMigrate(
-		&models.Contact{},
+		&models.User{},
 		&models.Manufacturer{},
 		&models.Brand{},
 		&models.CarModel{},

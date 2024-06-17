@@ -7,8 +7,9 @@ import (
 	"github.com/fredmessias43/car-hub/src/contracts"
 	"github.com/fredmessias43/car-hub/src/database"
 	"github.com/fredmessias43/car-hub/src/handlers"
+	"github.com/fredmessias43/car-hub/src/middleware"
 	"github.com/fredmessias43/car-hub/src/renderer"
-	"github.com/fredmessias43/car-hub/src/websocket"
+	"github.com/fredmessias43/car-hub/src/templates"
 	"github.com/gertd/go-pluralize"
 	"github.com/gin-gonic/gin"
 )
@@ -21,57 +22,69 @@ func main() {
 	}
 
 	config.Router = gin.Default()
+	config.Router.Use(config.SetContext())
 	config.Router.HTMLRender = &renderer.TemplRender{}
 	config.Router.Static("/assets", "./src/public/assets")
 
 	config.Router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/cars")
+		c.HTML(http.StatusOK, "", templates.HomePage())
 	})
 
-	config.WS = websocket.NewWebsocketServer()
+	/* config.WS = websocket.NewWebsocketServer()
 	go config.WS.Run()
 
 	config.Router.GET("/ws", func(c *gin.Context) {
 		websocket.ServeWs(config.WS, c.Writer, c.Request)
-	})
+	}) */
 
 	// Pages
+	authHandler := handlers.AuthHandler{}
+	config.Router.GET("/login", authHandler.ShowLogin)
+	config.Router.POST("/login", authHandler.Login)
+	config.Router.GET("/register", authHandler.ShowRegister)
+	config.Router.POST("/register", authHandler.Register)
+	config.Router.POST("/logout", authHandler.Logout)
 
-	contactHandler := handlers.ContactHandler{}
-	routerResource(config.Router, "contact", &contactHandler)
+	// userHandler := handlers.UserHandler{}
+	// routerResource(config.Router, "user", &userHandler)
 
-	manufacturerHandler := handlers.ManufacturerHandler{}
-	routerResource(config.Router, "manufacturer", &manufacturerHandler)
+	// auth
+	authenticated := config.Router.Group("/")
+	authenticated.Use(middleware.AuthMiddleware())
+	{
+		manufacturerHandler := handlers.ManufacturerHandler{}
+		routerResource(authenticated, "manufacturer", &manufacturerHandler)
 
-	brandHandler := handlers.BrandHandler{}
-	routerResource(config.Router, "brand", &brandHandler)
+		brandHandler := handlers.BrandHandler{}
+		routerResource(authenticated, "brand", &brandHandler)
 
-	carModelHandler := handlers.CarModelHandler{}
-	routerResource(config.Router, "car_model", &carModelHandler)
+		carModelHandler := handlers.CarModelHandler{}
+		routerResource(authenticated, "car_model", &carModelHandler)
 
-	carModelVersionHandler := handlers.CarModelVersionHandler{}
-	routerResource(config.Router, "car_model_version", &carModelVersionHandler)
+		carModelVersionHandler := handlers.CarModelVersionHandler{}
+		routerResource(authenticated, "car_model_version", &carModelVersionHandler)
 
-	carHandler := handlers.CarHandler{}
-	routerResource(config.Router, "car", &carHandler)
+		carHandler := handlers.CarHandler{}
+		routerResource(authenticated, "car", &carHandler)
 
-	// Other Pages
+		// Other Pages
 
-	integratedHandler := handlers.IntegratedHandler{}
-	config.Router.GET("/integrated", integratedHandler.Create)
-	config.Router.POST("/integrated", integratedHandler.Store)
-	config.Router.GET("/integrated/:car/edit", integratedHandler.Edit)
-	config.Router.PUT("/integrated/:car", integratedHandler.Update)
+		integratedHandler := handlers.IntegratedHandler{}
+		authenticated.GET("/integrated", integratedHandler.Create)
+		authenticated.POST("/integrated", integratedHandler.Store)
+		authenticated.GET("/integrated/:car/edit", integratedHandler.Edit)
+		authenticated.PUT("/integrated/:car", integratedHandler.Update)
 
-	// Components
+		// Components
 
-	manufacturerComponentHandler := handlers.ManufacturerComponentHandler{}
-	config.Router.GET("/manufacturers/:manufacturer/components/option", manufacturerComponentHandler.ShowOptionComponent)
+		manufacturerComponentHandler := handlers.ManufacturerComponentHandler{}
+		authenticated.GET("/manufacturers/:manufacturer/components/option", manufacturerComponentHandler.ShowOptionComponent)
+	}
 
 	config.Router.Run()
 }
 
-func routerResource(router *gin.Engine, key string, handler contracts.Handler) {
+func routerResource(router *gin.RouterGroup, key string, handler contracts.Handler) {
 	singular := pluralize.NewClient().Singular(key)
 	plural := pluralize.NewClient().Plural(key)
 
